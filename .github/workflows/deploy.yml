@@ -14,9 +14,16 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Clean up problematic cache
+        run: |
+          rm -rf node_modules/.cache/gh-pages || true
+          git submodule deinit -f --all || true
+          [ -f .gitmodules ] && rm -f .gitmodules || true
+          [ -f .git/config ] && rm -f .git/config || true
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -24,21 +31,18 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Create env file
-        run: |
-          touch .env
-          echo "VITE_SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
-          echo "VITE_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-          cat .env
-
       - name: Install dependencies
         run: npm install
 
       - name: Build project
-        run: npm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          # Build the project with environment variables
+          npm run build
+          # Remove any source maps that might contain sensitive information
+          find dist -name "*.map" -type f -delete
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
