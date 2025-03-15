@@ -35,18 +35,14 @@ jobs:
         run: npm install
 
       - name: Build project
+        env:
+          VITE_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          # Create a config file that will be used at runtime
-          echo "window.ENV = {" > public/config.js
-          echo "  VITE_OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'," >> public/config.js
-          echo "  VITE_SUPABASE_URL: '${{ secrets.SUPABASE_URL }}'," >> public/config.js
-          echo "  VITE_SUPABASE_ANON_KEY: '${{ secrets.SUPABASE_ANON_KEY }}'" >> public/config.js
-          echo "};" >> public/config.js
-          
-          # Build the project
+          # Build the project with environment variables
           npm run build
-          
-          # Remove source maps
+          # Remove any source maps that might contain sensitive information
           find dist -name "*.map" -type f -delete
 
       - name: Deploy to GitHub Pages
