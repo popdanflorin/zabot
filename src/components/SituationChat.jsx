@@ -13,7 +13,7 @@ const SituationChat = ({ situations }) => {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [situationDetails, setSituationDetails] = useState(null);
-  const [progress, setProgress] = useState(30); // Initial progress value
+  const [progress, setProgress] = useState(0); // Initial progress value
   const [showCompletion, setShowCompletion] = useState(false);
   const chatEndRef = useRef(null);
   const { id } = useParams();
@@ -269,7 +269,7 @@ const SituationChat = ({ situations }) => {
         </div>
       </div>
       <div className="chat-content">
-        <h3>{situation?.headline || 'Loading...'}</h3>
+        <h3>{situationDetails?.headline || 'Loading...'}</h3>
         <div className="progress-bar">
           <div 
             className="progress-fill" 
