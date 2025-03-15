@@ -31,23 +31,19 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Create env file
-        run: |
-          touch .env
-          echo "VITE_OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
-          echo "VITE_SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
-          echo "VITE_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-          cat .env
-
       - name: Install dependencies
         run: npm install
 
       - name: Build project
-        run: npm run build
-        env:
-          VITE_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          # Create a temporary .env file for build time
+          echo "VITE_OPENAI_API_KEY=placeholder" > .env
+          echo "VITE_SUPABASE_URL=placeholder" >> .env
+          echo "VITE_SUPABASE_ANON_KEY=placeholder" >> .env
+          # Build the project
+          npm run build
+          # Remove the temporary .env file
+          rm .env
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
