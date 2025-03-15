@@ -22,6 +22,18 @@
       }(window.location))
     </script>
     <!-- End Single Page Apps for GitHub Pages -->
+    <script>
+      // Check if we need to redirect to a specific route
+      (function() {
+        const redirect = sessionStorage.getItem('redirect');
+        if (redirect) {
+          sessionStorage.removeItem('redirect');
+          if (redirect !== '') {
+            history.replaceState(null, null, '/zabot/' + redirect);
+          }
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
