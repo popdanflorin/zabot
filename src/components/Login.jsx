@@ -310,44 +310,24 @@ const OrDivider = styled.div`
 `;
 
 const Login = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const [isInitialized, setIsInitialized] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const initSupabase = async () => {
-      try {
-        await supabase.auth.getSession();
-        setIsInitialized(true);
-      } catch (error) {
-        console.error('Error initializing Supabase:', error);
-        setError('Failed to initialize authentication. Please try again.');
-      }
-    };
-
-    initSupabase();
+    // Just set initialized to true, no auto-redirect
+    setIsInitialized(true);
   }, []);
 
-  useEffect(() => {
-    if (location.state?.message) {
-      setMessage(location.state.message);
-      window.history.replaceState({}, document.title);
-    }
-  }, [location]);
-
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    if (name === 'email') setEmail(value);
+    if (name === 'password') setPassword(value);
     setError(null);
   };
 
@@ -358,8 +338,8 @@ const Login = () => {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
+        email: email,
+        password: password,
       });
 
       if (error) {
@@ -403,7 +383,9 @@ const Login = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/zabot/chat`,
+          redirectTo: window.location.hostname === 'localhost' 
+            ? 'http://localhost:5173/zabot/chat'
+            : 'https://popdanflorin.github.io/zabot/chat',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -467,7 +449,7 @@ const Login = () => {
               type="email"
               name="email"
               placeholder="Enter your email address"
-              value={formData.email}
+              value={email}
               onChange={handleChange}
               required
             />
@@ -476,7 +458,7 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Enter your password"
-                value={formData.password}
+                value={password}
                 onChange={handleChange}
                 required
               />
