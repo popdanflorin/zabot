@@ -14,9 +14,16 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Clean up problematic cache
+        run: |
+          rm -rf node_modules/.cache/gh-pages
+          git submodule deinit -f --all
+          git rm -f .gitmodules
+          git rm -f .git/config
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
