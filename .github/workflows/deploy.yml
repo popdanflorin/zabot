@@ -31,7 +31,6 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-<<<<<<< HEAD
       - name: Create env file
         run: |
           touch .env
@@ -39,8 +38,6 @@ jobs:
           echo "VITE_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
           cat .env
 
-=======
->>>>>>> 91314a313ec4fdd8db145abd9652b1f38d30f825
       - name: Install dependencies
         run: npm install
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from './lib/supabaseClient';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
@@ -8,11 +8,12 @@ import ResetPassword from './components/ResetPassword';
 import ChatInterface from './components/ChatInterface';
 import SituationChat from './components/SituationChat';
 
-const ProtectedRoute = ({ children }) => {
+// Move ProtectedRoute inside a separate component that has access to router hooks
+const ProtectedRouteWrapper = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const location = window.location.pathname;
+  const location = useLocation();
 
   useEffect(() => {
     let mounted = true;
@@ -25,7 +26,7 @@ const ProtectedRoute = ({ children }) => {
         if (mounted) {
           setSession(currentSession);
           if (!currentSession) {
-            console.log('No active session, redirecting from:', location);
+            console.log('No active session, redirecting from:', location.pathname);
             navigate('/', { replace: true });
           }
         }
@@ -48,7 +49,7 @@ const ProtectedRoute = ({ children }) => {
         console.log('Auth state changed in ProtectedRoute:', session);
         setSession(session);
         if (!session) {
-          console.log('Session ended, redirecting from:', location);
+          console.log('Session ended, redirecting from:', location.pathname);
           navigate('/', { replace: true });
         }
       }
@@ -75,7 +76,6 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!session) {
-    console.log('No session in ProtectedRoute render, redirecting from:', location);
     return <Navigate to="/" replace />;
   }
 
@@ -85,56 +85,29 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   const [initializing, setInitializing] = useState(true);
   const [situations, setSituations] = useState([]);
-  const [session, setSession] = useState(null);
 
   useEffect(() => {
-    // Check authentication first
     const checkAuth = async () => {
       try {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
-        console.log('Initial session check:', currentSession);
-        setSession(currentSession);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          // Only fetch situations if we have a session
+          const { data, error } = await supabase.from('situations').select('*');
+          if (error) {
+            console.error('Error fetching situations:', error);
+          } else {
+            setSituations(data);
+          }
+        }
       } catch (error) {
-        console.error('Error checking initial session:', error);
+        console.error('Error in initial setup:', error);
       } finally {
         setInitializing(false);
       }
     };
 
     checkAuth();
-
-    // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state changed:', session);
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
-
-  // Only fetch situations if we have a session
-  useEffect(() => {
-    if (session) {
-      const fetchSituations = async () => {
-        try {
-          const { data, error } = await supabase
-            .from('situations')
-            .select('*');
-
-          if (error) {
-            console.error('Error fetching situations:', error);
-          } else {
-            console.log('Fetched situations:', data);
-            setSituations(data);
-          }
-        } catch (err) {
-          console.error('Error in fetchSituations:', err);
-        }
-      };
-
-      fetchSituations();
-    }
-  }, [session]);
 
   if (initializing) {
     return (
@@ -164,17 +137,17 @@ function App() {
         <Route
           path="/chat"
           element={
-            <ProtectedRoute>
+            <ProtectedRouteWrapper>
               <ChatInterface />
-            </ProtectedRoute>
+            </ProtectedRouteWrapper>
           }
         />
         <Route 
           path="/situation/:id" 
           element={
-            <ProtectedRoute>
+            <ProtectedRouteWrapper>
               <SituationChat situations={situations} />
-            </ProtectedRoute>
+            </ProtectedRouteWrapper>
           } 
         />
 
