@@ -20,10 +20,10 @@ jobs:
 
       - name: Clean up problematic cache
         run: |
-          rm -rf node_modules/.cache/gh-pages
-          git submodule deinit -f --all
-          git rm -f .gitmodules
-          git rm -f .git/config
+          rm -rf node_modules/.cache/gh-pages || true
+          git submodule deinit -f --all || true
+          [ -f .gitmodules ] && rm -f .gitmodules || true
+          [ -f .git/config ] && rm -f .git/config || true
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
