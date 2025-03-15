@@ -7,7 +7,8 @@ const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 // Initialize OpenAI instance
 openai = new OpenAI({
-  apiKey: OPENAI_API_KEY
+  apiKey: OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true
 });
 
 export const generateChatResponse = async (messages, situationContext) => {
