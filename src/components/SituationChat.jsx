@@ -16,6 +16,7 @@ const SituationChat = ({ situations }) => {
   const [progress, setProgress] = useState(0); // Initial progress value
   const [showCompletion, setShowCompletion] = useState(false);
   const chatEndRef = useRef(null);
+  const inputRef = useRef(null);
   const { id } = useParams();
   const navigate = useNavigate();
   
@@ -214,6 +215,7 @@ const SituationChat = ({ situations }) => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
+      inputRef.current.focus();
     }
   };
 
@@ -302,13 +304,14 @@ const SituationChat = ({ situations }) => {
         <form className="input-area" onSubmit={handleSendMessage}>
           <input
             type="text"
+            ref={inputRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type your message..."
             disabled={isTyping}
           />
           <button type="submit" disabled={isTyping || !message.trim()}>
-            {isTyping ? 'Bot is typing...' : 'Send'}
+            {isTyping ? situationDetails.bot_name + ' is typing...' : 'Send'}
           </button>
         </form>
         <div className="situation-description">
