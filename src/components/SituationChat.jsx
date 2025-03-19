@@ -13,16 +13,17 @@ const SituationChat = ({ situations }) => {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [situationDetails, setSituationDetails] = useState(null);
+  const [general_prompts, setGeneralPrompts] = useState(null);
   const [progress, setProgress] = useState(0); // Initial progress value
   const [showCompletion, setShowCompletion] = useState(false);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   console.log('Situations prop:', situations);
   console.log('Current ID:', id);
-  
+
   const situation = situations.find((s) => s.id === parseInt(id));
   console.log('Found situation:', situation);
 
@@ -38,29 +39,42 @@ const SituationChat = ({ situations }) => {
 
   const fetchSituationDetails = async () => {
     try {
-      console.log('Fetching situation details for ID:', id);
-      const { data, error } = await supabase
-        .from('situations')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const [situationResult, generalPromptsResult] = await Promise.all([
+        supabase.from('situations').select('*').eq('id', id).single(),
+        supabase.from('general_prompts').select('*').eq('is_active', 1)
+      ]);
+
+      const { data, error } = situationResult;
+      const { data: general_data, error: general_error } = generalPromptsResult;
 
       if (error) {
         console.error('Error fetching situation:', error);
         throw error;
       }
 
-      console.log('Fetched situation details:', data);
+      if (general_error) {
+        console.error('Error fetching general prompts:', general_error);
+        throw general_error;
+      }
+
+      // Ensure general_data is an array before mapping
+      const general_prompts = general_data?.length
+        ? general_data.map(item => item.prompt).join(' ')
+        : '';
+
+      console.log('Fetched situation:', data);
+      console.log('Concatenated General Prompts:', general_prompts);
+
       setSituationDetails(data);
-      
+      setGeneralPrompts(general_prompts);
+
       // Start the conversation with a generated message from OpenAI
       setIsTyping(true);
       try {
-        const situationContext = `You are ${data.bot_name || 'Customer'}, an angry customer. ${data.prompt || 'You are upset about a service issue.'}
-          Start the conversation by expressing your frustration about the situation. Be angry but remain realistic.`;
-        
+        const situationContext = data.prompt + general_prompts;
+
         console.log('Generating initial message with context:', situationContext);
-        
+
         const botResponse = await generateChatResponse(
           [], // Empty messages array since this is the first message
           situationContext
@@ -123,7 +137,7 @@ const SituationChat = ({ situations }) => {
     // Check for keywords and update progress
     const goodKeywords = situationDetails.good_keywords?.split(',').map(k => k.trim().toLowerCase()) || [];
     const badKeywords = situationDetails.bad_keywords?.split(',').map(k => k.trim().toLowerCase()) || [];
-    
+
     const messageLower = message.toLowerCase().trim();
     let progressChange = 0;
 
@@ -138,7 +152,7 @@ const SituationChat = ({ situations }) => {
       keyword = keyword.trim().toLowerCase();
       console.log(`Checking good keyword: "${keyword}"`);
       console.log(`Is "${keyword}" in "${messageLower}"?`, messageLower.indexOf(keyword) !== -1);
-      
+
       if (keyword && messageLower.indexOf(keyword) !== -1) {
         progressChange += 10;
         console.log(`✓ Found good keyword: "${keyword}"`);
@@ -150,7 +164,7 @@ const SituationChat = ({ situations }) => {
       keyword = keyword.trim().toLowerCase();
       console.log(`Checking bad keyword: "${keyword}"`);
       console.log(`Is "${keyword}" in "${messageLower}"?`, messageLower.indexOf(keyword) !== -1);
-      
+
       if (keyword && messageLower.indexOf(keyword) !== -1) {
         progressChange -= 10;
         console.log(`✓ Found bad keyword: "${keyword}"`);
@@ -159,11 +173,11 @@ const SituationChat = ({ situations }) => {
 
     console.log('Progress change:', progressChange);
     console.log('------- Keyword Check End -------');
-    
+
     setProgress(prev => {
       const newProgress = Math.min(Math.max(prev + progressChange, 0), 100);
       console.log('Progress update:', { old: prev, new: newProgress });
-      
+
       // Check if we just reached 100%
       if (newProgress === 100 && prev !== 100) {
         // Add a congratulatory bot message
@@ -174,13 +188,13 @@ const SituationChat = ({ situations }) => {
           timestamp: new Date().toISOString()
         };
         setMessages(currentMessages => [...currentMessages, congratsMessage]);
-        
+
         // Show completion overlay after a short delay
         setTimeout(() => {
           setShowCompletion(true);
         }, 1000);
       }
-      
+
       return newProgress;
     });
 
@@ -189,9 +203,8 @@ const SituationChat = ({ situations }) => {
 
     // Get bot response using OpenAI
     try {
-      const situationContext = `You are ${situationDetails.bot_name}, an angry customer. ${situationDetails.prompt}
-        Maintain your role as an angry customer, but react appropriately to the user's attempts to resolve the situation. If they handle the situation well, you can gradually become less angry.`;
-      
+      const situationContext = situationDetails.prompt + general_prompts;
+
       const botResponse = await generateChatResponse(
         [...messages, userMessage],
         situationContext
@@ -273,8 +286,8 @@ const SituationChat = ({ situations }) => {
       <div className="chat-content">
         <h3>{situationDetails?.headline || 'Loading...'}</h3>
         <div className="progress-bar">
-          <div 
-            className="progress-fill" 
+          <div
+            className="progress-fill"
             style={{ width: `${progress}%` }}
           />
           <div className="progress-tooltip">
@@ -327,7 +340,7 @@ const SituationChat = ({ situations }) => {
             <h2>Felicitări!</h2>
             <p>Ai finalizat cu succes această provocare!</p>
             <p>Ai demonstrat abilități excelente de comunicare și empatie.</p>
-            <button 
+            <button
               className="continue-button"
               onClick={() => navigate('/chat')}
             >
