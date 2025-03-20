@@ -366,7 +366,7 @@ const Login = () => {
         return;
       }
 
-      navigate('/chat');
+      navigate('/dashboard');
     } catch (error) {
       setError('An unexpected error occurred. Please try again.');
     } finally {
@@ -384,8 +384,8 @@ const Login = () => {
         provider: 'google',
         options: {
           redirectTo: window.location.hostname === 'localhost' 
-            ? 'http://localhost:5173/zabot/chat'
-            : 'https://popdanflorin.github.io/zabot/chat',
+            ? 'http://localhost:5173/zabot/dashboard'
+            : 'https://popdanflorin.github.io/zabot/dashboard',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',

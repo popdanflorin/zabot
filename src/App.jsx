@@ -5,8 +5,9 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
-import ChatInterface from './components/ChatInterface';
+import Dashboard from './components/Dashboard';
 import SituationChat from './components/SituationChat';
+import Bots from './components/Bots';
 
 // Move ProtectedRoute inside a separate component that has access to router hooks
 const ProtectedRouteWrapper = ({ children }) => {
@@ -135,10 +136,18 @@ function App() {
         
         {/* Protected routes */}
         <Route
-          path="/chat"
+          path="/dashboard"
           element={
             <ProtectedRouteWrapper>
-              <ChatInterface />
+              <Dashboard />
+            </ProtectedRouteWrapper>
+          }
+        />
+        <Route
+          path="/bots"
+          element={
+            <ProtectedRouteWrapper>
+              <Bots />
             </ProtectedRouteWrapper>
           }
         />

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { generateChatResponse } from '../lib/openai';
 import './SituationChat.css';
+import './Dashboard.css';
 
 const SituationChat = ({ situations }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -20,6 +21,7 @@ const SituationChat = ({ situations }) => {
   const inputRef = useRef(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   console.log('Situations prop:', situations);
   console.log('Current ID:', id);
@@ -254,32 +256,35 @@ const SituationChat = ({ situations }) => {
 
   return (
     <div className="chat-container">
+      <button className="hamburger-button" onClick={toggleSidebar}>
+        <div className="hamburger-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+
       <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
-        <button className="hamburger-button" onClick={toggleSidebar}>
-          <div className="hamburger-icon">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </button>
         <div className="sidebar-content">
-          <h2>Categories</h2>
-          <div className="category-buttons">
-            {loading ? (
-              <div className="loading">Loading categories...</div>
-            ) : error ? (
-              <div className="error">Error loading categories</div>
-            ) : (
-              categories.map((category) => (
-                <button
-                  key={category.id}
-                  className="category-button"
-                  onClick={() => handleCategoryClick(category)}
-                >
-                  {category.title}
-                </button>
-              ))
-            )}
+          <div className="nav-buttons">
+            <button 
+              className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`}
+              onClick={() => navigate('/dashboard')}
+            >
+              Dashboard
+            </button>
+            <button 
+              className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
+              onClick={() => navigate('/bots')}
+            >
+              Bots
+            </button>
+            <button 
+              className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
+              onClick={() => navigate('/reports')}
+            >
+              Reports
+            </button>
           </div>
         </div>
       </div>
