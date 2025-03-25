@@ -17,8 +17,12 @@ const SituationChat = ({ situations }) => {
   const [general_prompts, setGeneralPrompts] = useState(null);
   const [progress, setProgress] = useState(0); // Initial progress value
   const [showCompletion, setShowCompletion] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [showReport, setShowReport] = useState(false);
+  const [userProgress, setUserProgress] = useState(null);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
+  const timerRef = useRef(null);
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,6 +42,33 @@ const SituationChat = ({ situations }) => {
     // Scroll to bottom whenever messages update
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (situationDetails?.timer_in_minutes) {
+      setTimeLeft(situationDetails.timer_in_minutes * 60);
+    }
+  }, [situationDetails]);
+
+  useEffect(() => {
+    if (timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            setShowReport(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [timeLeft]);
 
   const fetchSituationDetails = async () => {
     try {
@@ -252,6 +283,172 @@ const SituationChat = ({ situations }) => {
     }
   };
 
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const calculateReport = () => {
+    const totalMessages = messages.length;
+    const userMessages = messages.filter(m => m.sender === 'user').length;
+    const botMessages = messages.filter(m => m.sender === 'bot').length;
+    const averageResponseTime = calculateAverageResponseTime();
+    
+    return {
+      totalMessages,
+      userMessages,
+      botMessages,
+      progress,
+      averageResponseTime,
+      timeSpent: situationDetails.timer_in_minutes * 60 - timeLeft
+    };
+  };
+
+  const calculateAverageResponseTime = () => {
+    let totalTime = 0;
+    let count = 0;
+    
+    for (let i = 1; i < messages.length; i++) {
+      if (messages[i].sender === 'user' && messages[i-1].sender === 'bot') {
+        const timeDiff = new Date(messages[i].timestamp) - new Date(messages[i-1].timestamp);
+        totalTime += timeDiff;
+        count++;
+      }
+    }
+    
+    return count > 0 ? Math.round(totalTime / count / 1000) : 0;
+  };
+
+  const analyzeCommunicationStyle = async (messages) => {
+    try {
+      // Extract only user messages
+      const userMessages = messages
+        .filter(m => m.sender === 'user')
+        .map(m => m.text)
+        .join('\n');
+
+      console.log('User messages for analysis:', userMessages);
+
+      const conversationContext = `You are an expert in communication analysis. Analyze the following user messages and provide a JSON response with the following metrics:
+        - overall_success: percentage (0-100) of how well the user handled the situation
+        - assertive_percent: percentage (0-100) of assertive communication
+        - aggressive_percent: percentage (0-100) of aggressive communication
+        - passive_percent: percentage (0-100) of passive communication
+
+        Consider these specific aspects for each communication style:
+
+        Assertive Communication (0-100%):
+        - Clear expression of needs and concerns
+        - Professional tone
+        - Direct but respectful communication
+        - Setting appropriate boundaries
+        - Asking for support in a constructive way
+
+        Aggressive Communication (0-100%):
+        - Hostile or confrontational language
+        - Demanding or threatening tone
+        - Disrespectful or unprofessional behavior
+        - Blaming or accusatory statements
+        - Overly emotional or heated responses
+        - Use of aggressive words or phrases
+        - Raising voice or using caps
+        - Personal attacks or insults
+
+        Passive Communication (0-100%):
+        - Avoiding direct communication
+        - Not expressing needs clearly
+        - Being overly accommodating
+        - Hesitant or uncertain language
+        - Difficulty setting boundaries
+
+        Overall Success (0-100%):
+        - How effectively the user achieved their goals
+        - Professional conduct
+        - Problem-solving approach
+        - Communication clarity
+        - Relationship maintenance
+
+        Situation Context:
+        ${situationDetails.prompt}
+
+        User Messages:
+        ${userMessages}
+
+        Provide the response in this exact JSON format:
+        {
+          "overall_success": number,
+          "assertive_percent": number,
+          "aggressive_percent": number,
+          "passive_percent": number
+        }`;
+
+      console.log('Sending analysis request to OpenAI with context:', conversationContext);
+
+      const analysis = await generateChatResponse(
+        [],
+        conversationContext
+      );
+
+      console.log('Raw analysis response:', analysis);
+
+      // Parse the JSON response
+      const metrics = JSON.parse(analysis);
+      console.log('Parsed communication style analysis:', metrics);
+      return metrics;
+    } catch (error) {
+      console.error('Error analyzing communication style:', error);
+      return {
+        overall_success: 0,
+        assertive_percent: 0,
+        aggressive_percent: 0,
+        passive_percent: 0
+      };
+    }
+  };
+
+  const saveUserProgress = async (metrics) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('user_progress')
+        .upsert({
+          user_id: user.id,
+          situation_id: id,
+          overall_success: metrics.overall_success,
+          assertive_percent: metrics.assertive_percent,
+          aggressive_percent: metrics.aggressive_percent,
+          passive_percent: metrics.passive_percent,
+          completed_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      setUserProgress(data);
+    } catch (error) {
+      console.error('Error saving user progress:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (timeLeft === 0 && showReport) {
+      const generateReport = async () => {
+        const metrics = await analyzeCommunicationStyle(messages);
+        await saveUserProgress(metrics);
+        setUserProgress(metrics);
+      };
+      generateReport();
+    }
+  }, [timeLeft, showReport, messages]);
+
+  const handleCloseReport = () => {
+    setMessages([]); // Clear messages when closing the report
+    navigate('/dashboard'); // Redirect to dashboard instead of chat
+  };
+
   if (!situationDetails) return <div>Loading situation...</div>;
 
   return (
@@ -289,7 +486,17 @@ const SituationChat = ({ situations }) => {
         </div>
       </div>
       <div className="chat-content">
-        <h3>{situationDetails?.headline || 'Loading...'}</h3>
+        <div className="chat-header">
+          <div 
+            className="timer" 
+            style={{ 
+              '--progress': `${(timeLeft / (situationDetails.timer_in_minutes * 60)) * 100}%` 
+            }}
+          >
+            <span>{formatTime(timeLeft)}</span>
+          </div>
+          <h3>{situation?.headline || 'Loading...'}</h3>
+        </div>
         <div className="progress-bar">
           <div
             className="progress-fill"
@@ -335,25 +542,51 @@ const SituationChat = ({ situations }) => {
         <div className="situation-description">
           <p>{situation?.description || ''}</p>
         </div>
-      </div>
 
-      {/* Completion Overlay */}
-      {showCompletion && (
-        <div className="completion-overlay">
-          <div className="completion-message">
-            <div className="completion-emoji">🎉</div>
-            <h2>Felicitări!</h2>
-            <p>Ai finalizat cu succes această provocare!</p>
-            <p>Ai demonstrat abilități excelente de comunicare și empatie.</p>
-            <button
-              className="continue-button"
-              onClick={() => navigate('/chat')}
-            >
-              Continuă cu următoarea provocare
-            </button>
+        {/* Completion Overlay */}
+        {showCompletion && (
+          <div className="completion-overlay">
+            <div className="completion-message">
+              <div className="completion-emoji">🎉</div>
+              <h2>Felicitări!</h2>
+              <p>Ai finalizat cu succes această provocare!</p>
+              <p>Ai demonstrat abilități excelente de comunicare și empatie.</p>
+              <button
+                className="continue-button"
+                onClick={() => navigate('/chat')}
+              >
+                Continuă cu următoarea provocare
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Report Popup */}
+        {showReport && (
+          <div className="report-overlay">
+            <div className="report-content">
+              <h2>Raport de Conversație</h2>
+              <div className="report-details">
+                <p>Progres General: {userProgress?.overall_success || 0}%</p>
+                <p>Stil Asertiv: {userProgress?.assertive_percent || 0}%</p>
+                <p>Stil Agresiv: {userProgress?.aggressive_percent || 0}%</p>
+                <p>Stil Pasiv: {userProgress?.passive_percent || 0}%</p>
+                <p>Mesaje Totale: {calculateReport().totalMessages}</p>
+                <p>Mesaje Utilizator: {calculateReport().userMessages}</p>
+                <p>Mesaje Bot: {calculateReport().botMessages}</p>
+                <p>Timp Răspuns Mediu: {calculateReport().averageResponseTime} secunde</p>
+                <p>Timp Total: {Math.floor(calculateReport().timeSpent / 60)} minute și {calculateReport().timeSpent % 60} secunde</p>
+              </div>
+              <button 
+                className="continue-button"
+                onClick={handleCloseReport}
+              >
+                Închide
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
