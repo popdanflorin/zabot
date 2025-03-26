@@ -375,7 +375,7 @@ const SituationChat = ({ situations }) => {
         User Messages:
         ${userMessages}
 
-        Provide the response in this exact JSON format:
+        Provide the response in this exact format:
         {
           "overall_success": number,
           "assertive_percent": number,
