@@ -22,12 +22,7 @@ const SituationChat = ({ situations }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-
-  console.log('Situations prop:', situations);
-  console.log('Current ID:', id);
-
   const situation = situations.find((s) => s.id === parseInt(id));
-  console.log('Found situation:', situation);
 
   useEffect(() => {
     fetchCategories();
@@ -214,10 +209,6 @@ const SituationChat = ({ situations }) => {
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const handleCategoryClick = (category) => {
-    navigate('/chat', { state: { selectedCategoryId: category.id } });
   };
 
   const handleLogout = async () => {
