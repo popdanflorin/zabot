@@ -7,16 +7,12 @@ import './Dashboard.css';
 
 const SituationChat = ({ situations }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [situationDetails, setSituationDetails] = useState(null);
   const [general_prompts, setGeneralPrompts] = useState(null);
-  const [progress, setProgress] = useState(0); // Initial progress value
-  const [showCompletion, setShowCompletion] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showReport, setShowReport] = useState(false);
   const [userProgress, setUserProgress] = useState(null);
@@ -167,65 +163,16 @@ const SituationChat = ({ situations }) => {
     };
     setMessages(prev => [...prev, userMessage]);
 
-    // Check for keywords and update progress
-    const goodKeywords = situationDetails.good_keywords?.split(',').map(k => k.trim().toLowerCase()) || [];
-    const badKeywords = situationDetails.bad_keywords?.split(',').map(k => k.trim().toLowerCase()) || [];
-
-    const messageLower = message.toLowerCase().trim();
-    let progressChange = 0;
-
-    // Log keywords for debugging
-    console.log('------- Keyword Check Start -------');
-    console.log('Message to check:', messageLower);
-    console.log('Good keywords to look for:', goodKeywords);
-    console.log('Bad keywords to look for:', badKeywords);
-
-    // Check for good keywords (phrases)
-    for (let keyword of goodKeywords) {
-      keyword = keyword.trim().toLowerCase();
-      console.log(`Checking good keyword: "${keyword}"`);
-      console.log(`Is "${keyword}" in "${messageLower}"?`, messageLower.indexOf(keyword) !== -1);
-
-      if (keyword && messageLower.indexOf(keyword) !== -1) {
-        progressChange += 10;
-        console.log(`✓ Found good keyword: "${keyword}"`);
-      }
-    }
-
-    // Check for bad keywords (phrases)
-    for (let keyword of badKeywords) {
-      keyword = keyword.trim().toLowerCase();
-      console.log(`Checking bad keyword: "${keyword}"`);
-      console.log(`Is "${keyword}" in "${messageLower}"?`, messageLower.indexOf(keyword) !== -1);
-
-      if (keyword && messageLower.indexOf(keyword) !== -1) {
-        progressChange -= 10;
-        console.log(`✓ Found bad keyword: "${keyword}"`);
-      }
-    }
-
-    console.log('Progress change:', progressChange);
-    console.log('------- Keyword Check End -------');
+    let progressChange = 100 / situationDetails.max_messages;
 
     setProgress(prev => {
       const newProgress = Math.min(Math.max(prev + progressChange, 0), 100);
       console.log('Progress update:', { old: prev, new: newProgress });
 
       // Check if we just reached 100%
-      if (newProgress === 100 && prev !== 100) {
-        // Add a congratulatory bot message
-        const congratsMessage = {
-          id: messages.length + 2,
-          text: "Felicitări! Ai gestionat această situație cu succes. Ai demonstrat abilități excelente de comunicare și empatie!",
-          sender: 'bot',
-          timestamp: new Date().toISOString()
-        };
-        setMessages(currentMessages => [...currentMessages, congratsMessage]);
-
-        // Show completion overlay after a short delay
-        setTimeout(() => {
-          setShowCompletion(true);
-        }, 1000);
+      if (newProgress === 100) {
+        setShowReport(true);
+        setTimeLeft(0);
       }
 
       return newProgress;
@@ -542,24 +489,6 @@ const SituationChat = ({ situations }) => {
         <div className="situation-description">
           <p>{situation?.description || ''}</p>
         </div>
-
-        {/* Completion Overlay */}
-        {showCompletion && (
-          <div className="completion-overlay">
-            <div className="completion-message">
-              <div className="completion-emoji">🎉</div>
-              <h2>Felicitări!</h2>
-              <p>Ai finalizat cu succes această provocare!</p>
-              <p>Ai demonstrat abilități excelente de comunicare și empatie.</p>
-              <button
-                className="continue-button"
-                onClick={() => navigate('/chat')}
-              >
-                Continuă cu următoarea provocare
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Report Popup */}
         {showReport && (
