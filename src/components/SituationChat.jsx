@@ -16,6 +16,9 @@ const SituationChat = ({ situations }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [showReport, setShowReport] = useState(false);
   const [userProgress, setUserProgress] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
   const timerRef = useRef(null);
@@ -60,7 +63,7 @@ const SituationChat = ({ situations }) => {
       }
     };
   }, [timeLeft]);
-
+//
   const fetchSituationDetails = async () => {
     try {
       const [situationResult, generalPromptsResult] = await Promise.all([
@@ -86,9 +89,6 @@ const SituationChat = ({ situations }) => {
         ? general_data.map(item => item.prompt).join(' ')
         : '';
 
-      console.log('Fetched situation:', data);
-      console.log('Concatenated General Prompts:', general_prompts);
-
       setSituationDetails(data);
       setGeneralPrompts(general_prompts);
 
@@ -97,14 +97,10 @@ const SituationChat = ({ situations }) => {
       try {
         const situationContext = data.prompt + general_prompts;
 
-        console.log('Generating initial message with context:', situationContext);
-
         const botResponse = await generateChatResponse(
           [], // Empty messages array since this is the first message
           situationContext
         );
-
-        console.log('Generated bot response:', botResponse);
 
         const botMessage = {
           id: 0,
@@ -134,8 +130,6 @@ const SituationChat = ({ situations }) => {
         .order('id');
 
       if (error) throw error;
-
-      console.log(data);
       setCategories(data);
     } catch (err) {
       setError(err.message);
@@ -162,8 +156,6 @@ const SituationChat = ({ situations }) => {
 
     setProgress(prev => {
       const newProgress = Math.min(Math.max(prev + progressChange, 0), 100);
-      console.log('Progress update:', { old: prev, new: newProgress });
-
       // Check if we just reached 100%
       if (newProgress === 100) {
         setShowReport(true);
@@ -231,116 +223,133 @@ const SituationChat = ({ situations }) => {
     const totalMessages = messages.length;
     const userMessages = messages.filter(m => m.sender === 'user').length;
     const botMessages = messages.filter(m => m.sender === 'bot').length;
-    const averageResponseTime = calculateAverageResponseTime();
     
     return {
       totalMessages,
       userMessages,
       botMessages,
       progress,
-      averageResponseTime,
       timeSpent: situationDetails.timer_in_minutes * 60 - timeLeft
     };
   };
 
-  const calculateAverageResponseTime = () => {
-    let totalTime = 0;
-    let count = 0;
-    
-    for (let i = 1; i < messages.length; i++) {
-      if (messages[i].sender === 'user' && messages[i-1].sender === 'bot') {
-        const timeDiff = new Date(messages[i].timestamp) - new Date(messages[i-1].timestamp);
-        totalTime += timeDiff;
-        count++;
-      }
-    }
-    
-    return count > 0 ? Math.round(totalTime / count / 1000) : 0;
-  };
-
   const analyzeCommunicationStyle = async (messages) => {
     try {
-      // Extract only user messages
       const userMessages = messages
         .filter(m => m.sender === 'user')
         .map(m => m.text)
         .join('\n');
 
-      console.log('User messages for analysis:', userMessages);
+      const conversationContext = `You are a communication analysis expert. Analyze the following conversation and provide a detailed analysis of the communication style and effectiveness.
 
-      const conversationContext = `You are an expert in communication analysis. Analyze the following user messages and provide a JSON response with the following metrics:
-        - overall_success: percentage (0-100) of how well the user handled the situation
-        - assertive_percent: percentage (0-100) of assertive communication
-        - aggressive_percent: percentage (0-100) of aggressive communication
-        - passive_percent: percentage (0-100) of passive communication
+User Messages:
+${userMessages}
 
-        Consider these specific aspects for each communication style:
+Situation Context:
+${situation?.prompt || ''}
 
-        Assertive Communication (0-100%):
-        - Clear expression of needs and concerns
-        - Professional tone
-        - Direct but respectful communication
-        - Setting appropriate boundaries
-        - Asking for support in a constructive way
+You must respond with a valid JSON object in this exact format:
+{
+  "overall_success": number (0-100),
+  "assertive_percent": number (0-100),
+  "aggressive_percent": number (0-100),
+  "passive_percent": number (0-100),
+  "dialogue_good_points":"The single most effective message that contributed to the success of the conversation. Include the exact quote and explain in a few words (max 10 words) why it was effective. The explanation must be in ROMANIAN.",
+  "recommendation1": "First specific recommendation for improvement (in ROMANIAN, for the user only)",
+  "recommendation2": "Second specific recommendation for improvement (in ROMANIAN, for the user only)"
+}
 
-        Aggressive Communication (0-100%):
-        - Hostile or confrontational language
-        - Demanding or threatening tone
-        - Disrespectful or unprofessional behavior
-        - Blaming or accusatory statements
-        - Overly emotional or heated responses
-        - Use of aggressive words or phrases
-        - Raising voice or using caps
-        - Personal attacks or insults
+IMPORTANT RULES:
+- Return ONLY the JSON object, without any explanation, comment, or additional text.
+- Do NOT include Markdown formatting, code blocks, or triple backticks.
+- Make sure the JSON is WELL-FORMED and parsable by standard JSON parsers.
+- All string values MUST be properly quoted using double quotes (").
+- Ensure the JSON object is COMPLETE (no missing or truncated fields).
+- Make sure all texts, explanations, and recommendations are in **ROMANIAN**.
 
-        Passive Communication (0-100%):
-        - Avoiding direct communication
-        - Not expressing needs clearly
-        - Being overly accommodating
-        - Hesitant or uncertain language
-        - Difficulty setting boundaries
+Consider these aspects for the analysis:
+1. Overall Success (0-100):
+   - Achievement of stated goals
+   - Effectiveness of communication
+   - Resolution of issues
+   - Professional conduct
 
-        Overall Success (0-100%):
-        - How effectively the user achieved their goals
-        - Professional conduct
-        - Problem-solving approach
-        - Communication clarity
-        - Relationship maintenance
+2. Communication Styles:
+   - Assertive: Clear expression of needs, respectful tone, balanced approach
+   - Aggressive: Hostile tone, personal attacks, demanding language
+   - Passive: Avoidance, unclear needs, excessive agreement
 
-        Situation Context:
-        ${situationDetails.prompt}
+3. Best Message Selection:
+   - Choose the single most impactful message written by the USER.
+   - Consider how it advanced the conversation.
+   - Look for messages that:
+     * Clearly expressed needs or concerns
+     * Demonstrated professional tone
+     * Showed effective problem-solving
+     * Led to positive outcomes
+   - Include the exact quote and a short explanation in ROMANIAN of why it was effective.
 
-        User Messages:
-        ${userMessages}
+4. Recommendations:
+   - Must be addressed ONLY to the USER, NOT to the bot.
+   - Must be based exclusively on the USER'S messages and behavior.
+   - Must be written in ROMANIAN.
+   - Provide practical, actionable, and specific advice the USER could apply in similar future conversations.
+   - Do NOT give recommendations related to the bot or the AI model.
+   - If you accidentally give advice for the bot, immediately discard it and only provide recommendations for the user.
+`;
 
-        Provide the response in this exact format:
-        {
-          "overall_success": number,
-          "assertive_percent": number,
-          "aggressive_percent": number,
-          "passive_percent": number
-        }`;
-
-      console.log('Sending analysis request to OpenAI with context:', conversationContext);
-
-      const analysis = await generateChatResponse(
-        [],
-        conversationContext
-      );
-
-      console.log('Raw analysis response:', analysis);
-
-      // Parse the JSON response
-      const metrics = JSON.parse(analysis);
-      console.log('Parsed communication style analysis:', metrics);
-      return metrics;
+      const analysis = await generateChatResponse([], conversationContext);
+      
+      try {
+        // Try to parse the JSON
+        let metrics;
+        try {
+          metrics = JSON.parse(analysis);
+        } catch (parseError) {
+          // If parsing fails, try to extract just the JSON object
+          const jsonMatch = analysis.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            metrics = JSON.parse(jsonMatch[0]);
+          } else {
+            throw new Error('No valid JSON object found in response');
+          }
+        }        
+        // Validate the metrics object has all required fields
+        const requiredFields = [
+          'overall_success',
+          'assertive_percent',
+          'aggressive_percent',
+          'passive_percent',
+          'dialogue_good_points',
+          'recommendation1',
+          'recommendation2'
+        ];
+        
+        const missingFields = requiredFields.filter(field => !(field in metrics));
+        if (missingFields.length > 0) {
+          throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+        }
+        
+        // if (!Array.isArray(metrics.dialogue_good_points) || metrics.dialogue_good_points.length === 0) {
+        //   metrics.dialogue_good_points = ["No effective messages found in the conversation"];
+        // }
+        
+        return metrics;
+      } catch (parseError) {
+        console.error('Error parsing analysis response:', parseError);
+        console.error('Failed to parse JSON:', analysis);
+        throw new Error('Failed to parse analysis response as JSON');
+      }
     } catch (error) {
-      console.error('Error analyzing communication style:', error);
+      console.error('Error in analyzeCommunicationStyle:', error);
       return {
         overall_success: 0,
         assertive_percent: 0,
         aggressive_percent: 0,
-        passive_percent: 0
+        passive_percent: 0,
+        dialogue_good_points: "Unable to analyze conversation",
+        recommendation1: "Unable to generate recommendations",
+        recommendation2: "Please try again later"
       };
     }
   };
@@ -349,6 +358,11 @@ const SituationChat = ({ situations }) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Ensure arrays are properly formatted
+      // const dialoguePoints = Array.isArray(metrics.dialogue_good_points) 
+      //   ? metrics.dialogue_good_points 
+      //   : [];
 
       const { data, error } = await supabase
         .from('user_progress')
@@ -359,6 +373,9 @@ const SituationChat = ({ situations }) => {
           assertive_percent: metrics.assertive_percent,
           aggressive_percent: metrics.aggressive_percent,
           passive_percent: metrics.passive_percent,
+          dialogue_good_points: metrics.dialogue_good_points,
+          recommendation1: metrics.recommendation1 || "No recommendation available",
+          recommendation2: metrics.recommendation2 || "No recommendation available",
           completed_at: new Date().toISOString()
         })
         .select()
@@ -368,6 +385,27 @@ const SituationChat = ({ situations }) => {
       setUserProgress(data);
     } catch (error) {
       console.error('Error saving user progress:', error);
+    }
+  };
+
+  const generateRecommendations = async (userMessages) => {
+    try {
+      const prompt = `Based on the following user messages, provide 2 specific recommendations to improve their communication skills. Focus on practical, actionable advice.
+
+User Messages:
+${userMessages.join('\n')}
+
+Provide the response addresed to the user in this exact format:
+{
+  "recommendation1": "First recommendation",
+  "recommendation2": "Second recommendation"
+}`;
+
+      const response = await generateChatResponse([], prompt);
+      const recommendations = JSON.parse(response);
+      return [recommendations.recommendation1, recommendations.recommendation2];
+    } catch (error) {
+      return ["Unable to generate recommendations", "Please try again later"];
     }
   };
 
@@ -487,15 +525,26 @@ const SituationChat = ({ situations }) => {
             <div className="report-content">
               <h2>Raport de Conversație</h2>
               <div className="report-details">
-                <p>Progres General: {userProgress?.overall_success || 0}%</p>
-                <p>Stil Asertiv: {userProgress?.assertive_percent || 0}%</p>
-                <p>Stil Agresiv: {userProgress?.aggressive_percent || 0}%</p>
-                <p>Stil Pasiv: {userProgress?.passive_percent || 0}%</p>
-                <p>Mesaje Totale: {calculateReport().totalMessages}</p>
-                <p>Mesaje Utilizator: {calculateReport().userMessages}</p>
-                <p>Mesaje Bot: {calculateReport().botMessages}</p>
-                <p>Timp Răspuns Mediu: {calculateReport().averageResponseTime} secunde</p>
-                <p>Timp Total: {Math.floor(calculateReport().timeSpent / 60)} minute și {calculateReport().timeSpent % 60} secunde</p>
+                <div className="metrics-section">
+                  <h3>Metrici de Comunicare</h3>
+                  <p>Progres General: {userProgress?.overall_success || 0}%</p>
+                  <p>Stil Asertiv: {userProgress?.assertive_percent || 0}%</p>
+                  <p>Stil Agresiv: {userProgress?.aggressive_percent || 0}%</p>
+                  <p>Stil Pasiv: {userProgress?.passive_percent || 0}%</p>
+                </div>
+
+                <div className="good-points-section">
+                  <h3>Puncte Forte în Dialog</h3>
+                  <p>{userProgress?.dialogue_good_points}</p>
+                </div>
+
+                <div className="recommendations-section">
+                  <h3>Recomandări pentru Îmbunătățire</h3>
+                  <ul>
+                    <li>{userProgress?.recommendation1}</li>
+                    <li>{userProgress?.recommendation2}</li>
+                  </ul>
+                </div>
               </div>
               <button 
                 className="continue-button"
