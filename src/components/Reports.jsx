@@ -3,11 +3,10 @@ import { supabase } from '../lib/supabaseClient';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
 
-const Dashboard = () => {
+const Reports = () => {
   const [user, setUser] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [reports, setReports] = useState([]);
-  const [suggestedBots, setSuggestedBots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -26,6 +25,7 @@ const Dashboard = () => {
         
         if (!user) throw new Error('No user found');
 
+        // Fetch user progress with situation details
         const { data: progressData, error: progressError } = await supabase
           .from('user_progress')
           .select(`
@@ -35,8 +35,7 @@ const Dashboard = () => {
             )
           `)
           .eq('user_id', user.id)
-          .order('completed_at', { ascending: false })
-          .limit(5);
+          .order('completed_at', { ascending: false });
 
         if (progressError) throw progressError;
         setReports(progressData);
@@ -48,23 +47,8 @@ const Dashboard = () => {
       }
     };
 
-    const fetchSuggestedBots = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('situations')
-          .select('*')
-          .limit(5);
-
-        if (error) throw error;
-        setSuggestedBots(data);
-      } catch (err) {
-        console.error('Error fetching suggested bots:', err);
-      }
-    };
-
     getUser();
     fetchReports();
-    fetchSuggestedBots();
   }, []);
 
   const handleLogout = async () => {
@@ -85,7 +69,9 @@ const Dashboard = () => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -93,19 +79,6 @@ const Dashboard = () => {
     if (success >= 80) return '#4ade80'; // green
     if (success >= 60) return '#fbbf24'; // yellow
     return '#f87171'; // red
-  };
-
-  const getDifficultyText = (difficulty) => {
-    switch (difficulty) {
-      case 0:
-        return 'Easy';
-      case 1:
-        return 'Medium';
-      case 2:
-        return 'Hard';
-      default:
-        return 'Unknown';
-    }
   };
 
   return (
@@ -145,7 +118,7 @@ const Dashboard = () => {
 
       <div className="main-content">
         <div className="dashboard-header">
-          <h1>Dashboard</h1>
+          <h1>Reports</h1>
           <button onClick={handleLogout} className="logout-button">
             Logout
           </button>
@@ -154,10 +127,9 @@ const Dashboard = () => {
         <div className="dashboard-content">
           <div className="reports-section">
             <div className="section-header">
-              <h2>Most Recent Reports</h2>
-              <a href="/zabot/reports" className="see-all-link">See All Reports</a>
+              <h2>Your Progress Reports</h2>
             </div>
-            <div className="reports-grid">
+            <div className="bots-grid">
               {loading ? (
                 <div className="loading">Loading reports...</div>
               ) : error ? (
@@ -166,42 +138,42 @@ const Dashboard = () => {
                 <div className="no-reports">No reports available yet. Complete some situations to see your progress!</div>
               ) : (
                 reports.map((report) => (
-                  <div key={report.id} className="report-card">
-                    <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
-                    <span 
-                      className="difficulty-badge"
-                      style={{ backgroundColor: getSuccessColor(report.overall_success) }}
-                    >
-                      {report.overall_success}% Success
-                    </span>
-                    <span className="report-date">{formatDate(report.completed_at)}</span>
+                  <div key={report.id} className="bot-card">
+                    <div className="bot-card-content">
+                      <div className="bot-card-header">
+                        <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
+                        <span 
+                          className="difficulty-badge"
+                          style={{ backgroundColor: getSuccessColor(report.overall_success) }}
+                        >
+                          {report.overall_success}% Success
+                        </span>
+                      </div>
+                      <div className="report-details">
+                        <div className="report-metrics">
+                          <p>Assertive: {report.assertive_percent}%</p>
+                          <p>Aggressive: {report.aggressive_percent}%</p>
+                          <p>Passive: {report.passive_percent}%</p>
+                        </div>
+                        <div className="report-good-points">
+                          <h4>Good Points:</h4>
+                          <p>{report.dialogue_good_points}</p>
+                        </div>
+                        <div className="report-recommendations">
+                          <h4>Recommendations:</h4>
+                          <ul>
+                            <li>{report.recommendation1}</li>
+                            <li>{report.recommendation2}</li>
+                          </ul>
+                        </div>
+                        <div className="report-date">
+                          Completed: {formatDate(report.completed_at)}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ))
               )}
-            </div>
-
-            <div className="section-header" style={{ marginTop: '40px' }}>
-              <h2>Suggested Bots</h2>
-              <a href="/zabot/bots" className="see-all-link">See All Bots</a>
-            </div>
-            <div className="reports-grid">
-              {suggestedBots.map((bot) => (
-                <div 
-                  key={bot.id} 
-                  className="report-card"
-                  onClick={() => navigate(`/situation/${bot.id}`)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <h3>{bot.bot_name}</h3>
-                  <span 
-                    className="difficulty-badge"
-                    style={{ backgroundColor: '#6c5ce7' }}
-                  >
-                    {getDifficultyText(bot.difficulty)}
-                  </span>
-                  <span className="report-date">{bot.category}</span>
-                </div>
-              ))}
             </div>
           </div>
         </div>
@@ -210,4 +182,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default Reports;

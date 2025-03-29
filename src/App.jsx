@@ -8,6 +8,7 @@ import ResetPassword from './components/ResetPassword';
 import Dashboard from './components/Dashboard';
 import SituationChat from './components/SituationChat';
 import Bots from './components/Bots';
+import Reports from './components/Reports';
 
 // Move ProtectedRoute inside a separate component that has access to router hooks
 const ProtectedRouteWrapper = ({ children }) => {
@@ -148,6 +149,14 @@ function App() {
           element={
             <ProtectedRouteWrapper>
               <Bots />
+            </ProtectedRouteWrapper>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRouteWrapper>
+              <Reports />
             </ProtectedRouteWrapper>
           }
         />
