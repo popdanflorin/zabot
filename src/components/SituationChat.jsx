@@ -235,18 +235,9 @@ const SituationChat = ({ situations }) => {
 
   const analyzeCommunicationStyle = async (messages) => {
     try {
-      const userMessages = messages
-        .filter(m => m.sender === 'user')
-        .map(m => m.text)
-        .join('\n');
 
       const conversationContext = `You are a communication analysis expert. Analyze the following conversation and provide a detailed analysis of the communication style and effectiveness.
-
-User Messages:
-${userMessages}
-
-Situation Context:
-${situation?.prompt || ''}
+      The objective of the conversation is for the user to help with the bot's problem.
 
 You must respond with a valid JSON object in this exact format:
 {
@@ -298,7 +289,7 @@ Consider these aspects for the analysis:
    - If you accidentally give advice for the bot, immediately discard it and only provide recommendations for the user.
 `;
 
-      const analysis = await generateChatResponse([], conversationContext);
+      const analysis = await generateChatResponse(messages, conversationContext);
       
       try {
         // Try to parse the JSON
