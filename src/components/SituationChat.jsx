@@ -11,14 +11,13 @@ const SituationChat = ({ situations }) => {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [situationDetails, setSituationDetails] = useState(null);
-  const [general_prompts, setGeneralPrompts] = useState(null);
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showReport, setShowReport] = useState(false);
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [categories, setCategories] = useState([]);
+  const [evaluationTypes, setEvaluationTypes] = useState([]);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
   const timerRef = useRef(null);
@@ -28,8 +27,8 @@ const SituationChat = ({ situations }) => {
   const situation = situations.find((s) => s.id === parseInt(id));
 
   useEffect(() => {
-    fetchCategories();
     fetchSituationDetails();
+    fetchEvaluationTypes();
   }, [id]);
 
   useEffect(() => {
@@ -66,36 +65,23 @@ const SituationChat = ({ situations }) => {
 //
   const fetchSituationDetails = async () => {
     try {
-      const [situationResult, generalPromptsResult] = await Promise.all([
-        supabase.from('situations').select('*').eq('id', id).single(),
-        supabase.from('general_prompts').select('*').eq('is_active', 1)
-      ]);
-
-      const { data, error } = situationResult;
-      const { data: general_data, error: general_error } = generalPromptsResult;
+      const { data, error } = await supabase
+          .from('situations')
+          .select('*, bot_behaviours:bot_behaviour_id(*)') 
+          .eq('id', id)
+          .single();
 
       if (error) {
         console.error('Error fetching situation:', error);
         throw error;
       }
 
-      if (general_error) {
-        console.error('Error fetching general prompts:', general_error);
-        throw general_error;
-      }
-
-      // Ensure general_data is an array before mapping
-      const general_prompts = general_data?.length
-        ? general_data.map(item => item.prompt).join(' ')
-        : '';
-
       setSituationDetails(data);
-      setGeneralPrompts(general_prompts);
 
       // Start the conversation with a generated message from OpenAI
       setIsTyping(true);
       try {
-        const situationContext = data.prompt + general_prompts;
+        const situationContext = data.prompt + data.objectives + data.initial_phrase + data.bot_behaviours.prompt;
 
         const botResponse = await generateChatResponse(
           [], // Empty messages array since this is the first message
@@ -121,19 +107,19 @@ const SituationChat = ({ situations }) => {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchEvaluationTypes = async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('categories')
+        .from('evaluation_types')
         .select('*')
         .order('id');
 
       if (error) throw error;
-      setCategories(data);
+      setEvaluationTypes(data);
     } catch (err) {
       setError(err.message);
-      console.error('Error fetching categories:', err);
+      console.error('Error fetching evaluation types:', err);
     } finally {
       setLoading(false);
     }
@@ -170,7 +156,7 @@ const SituationChat = ({ situations }) => {
 
     // Get bot response using OpenAI
     try {
-      const situationContext = situationDetails.prompt + general_prompts;
+      const situationContext = situationDetails.prompt + situationDetails.objectives + situationDetails.initial_phrase + situationDetails.bot_behaviours.prompt;
 
       const botResponse = await generateChatResponse(
         [...messages, userMessage],
@@ -236,58 +222,7 @@ const SituationChat = ({ situations }) => {
   const analyzeCommunicationStyle = async (messages) => {
     try {
 
-      const conversationContext = `You are a communication analysis expert. Analyze the following conversation and provide a detailed analysis of the communication style and effectiveness.
-      The objective of the conversation is for the user to help with the bot's problem.
-
-You must respond with a valid JSON object in this exact format:
-{
-  "overall_success": number (0-100),
-  "assertive_percent": number (0-100),
-  "aggressive_percent": number (0-100),
-  "passive_percent": number (0-100),
-  "dialogue_good_points":"The single most effective message that contributed to the success of the conversation. Include the exact quote and explain in a few words (max 10 words) why it was effective. The explanation must be in ROMANIAN.",
-  "recommendation1": "First specific recommendation for improvement (in ROMANIAN, for the user only)",
-  "recommendation2": "Second specific recommendation for improvement (in ROMANIAN, for the user only)"
-}
-
-IMPORTANT RULES:
-- Return ONLY the JSON object, without any explanation, comment, or additional text.
-- Do NOT include Markdown formatting, code blocks, or triple backticks.
-- Make sure the JSON is WELL-FORMED and parsable by standard JSON parsers.
-- All string values MUST be properly quoted using double quotes (").
-- Ensure the JSON object is COMPLETE (no missing or truncated fields).
-- Make sure all texts, explanations, and recommendations are in **ROMANIAN**.
-
-Consider these aspects for the analysis:
-1. Overall Success (0-100):
-   - Achievement of stated goals
-   - Effectiveness of communication
-   - Resolution of issues
-   - Professional conduct
-
-2. Communication Styles:
-   - Assertive: Clear expression of needs, respectful tone, balanced approach
-   - Aggressive: Hostile tone, personal attacks, demanding language
-   - Passive: Avoidance, unclear needs, excessive agreement
-
-3. Best Message Selection:
-   - Choose the single most impactful message written by the USER.
-   - Consider how it advanced the conversation.
-   - Look for messages that:
-     * Clearly expressed needs or concerns
-     * Demonstrated professional tone
-     * Showed effective problem-solving
-     * Led to positive outcomes
-   - Include the exact quote and a short explanation in ROMANIAN of why it was effective.
-
-4. Recommendations:
-   - Must be addressed ONLY to the USER, NOT to the bot.
-   - Must be based exclusively on the USER'S messages and behavior.
-   - Must be written in ROMANIAN.
-   - Provide practical, actionable, and specific advice the USER could apply in similar future conversations.
-   - Do NOT give recommendations related to the bot or the AI model.
-   - If you accidentally give advice for the bot, immediately discard it and only provide recommendations for the user.
-`;
+      const conversationContext = evaluationTypes[0].prompt; //TODO use the prompt on the user's subscription
 
       const analysis = await generateChatResponse(messages, conversationContext);
       
