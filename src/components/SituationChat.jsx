@@ -335,16 +335,20 @@ Provide the response addresed to the user in this exact format:
     }
   };
 
+  const [reportGenerated, setReportGenerated] = useState(false);
+
+  const generateReport = async () => {
+    const metrics = await analyzeCommunicationStyle(messages);
+    await saveUserProgress(metrics);
+    setUserProgress(metrics);
+    setReportGenerated(true);
+  };
+
   useEffect(() => {
-    if (timeLeft === 0 && showReport) {
-      const generateReport = async () => {
-        const metrics = await analyzeCommunicationStyle(messages);
-        await saveUserProgress(metrics);
-        setUserProgress(metrics);
-      };
+    if (timeLeft === 0 && showReport && !reportGenerated) {
       generateReport();
     }
-  }, [timeLeft, showReport, messages]);
+  }, [timeLeft, showReport]);
 
   const handleCloseReport = () => {
     setMessages([]); // Clear messages when closing the report
@@ -446,7 +450,7 @@ Provide the response addresed to the user in this exact format:
         </div>
 
         {/* Report Popup */}
-        {showReport && (
+        {reportGenerated && (
           <div className="report-overlay">
             <div className="report-content">
               <h2>Raport de Conversație</h2>
