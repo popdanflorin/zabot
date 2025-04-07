@@ -23,17 +23,14 @@ const ProtectedRouteWrapper = ({ children }) => {
     const checkSession = async () => {
       try {
         const { data: { session: currentSession } } = await supabase.auth.getSession();
-        console.log('Protected Route - Session check:', currentSession);
-        
         if (mounted) {
           setSession(currentSession);
           if (!currentSession) {
-            console.log('No active session, redirecting from:', location.pathname);
             navigate('/', { replace: true });
           }
         }
       } catch (error) {
-        console.error('Error checking session:', error);
+        console.error(error);
         if (mounted) {
           navigate('/', { replace: true });
         }
@@ -48,10 +45,8 @@ const ProtectedRouteWrapper = ({ children }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (mounted) {
-        console.log('Auth state changed in ProtectedRoute:', session);
         setSession(session);
         if (!session) {
-          console.log('Session ended, redirecting from:', location.pathname);
           navigate('/', { replace: true });
         }
       }

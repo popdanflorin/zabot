@@ -14,7 +14,16 @@ const SituationChat = ({ situations }) => {
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showReport, setShowReport] = useState(false);
-  const [userProgress, setUserProgress] = useState(null);
+  const mockMode = true;
+  const [userProgress, setUserProgress] = useState(mockMode ? {
+    overall_success: 82,
+    assertive_percent: 65,
+    aggressive_percent: 10,
+    passive_percent: 25,
+    dialogue_good_points: "Mesajul 'Apreciez eforturile tale' a avut cel mai mare impact deoarece transmite empatie și colaborare.",
+    recommendation1: "În loc să spui 'Nu cred că e o idee bună', poți spune 'Cred că putem îmbunătăți ideea analizând alternativele'.",
+    recommendation2: "În loc să spui 'Nu mă interesează', poți spune 'Aș vrea să discutăm altă opțiune care mă atrage mai mult'."
+  } : null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [evaluationTypes, setEvaluationTypes] = useState([]);
@@ -62,6 +71,12 @@ const SituationChat = ({ situations }) => {
       }
     };
   }, [timeLeft]);
+
+  useEffect(() => {
+    if (!isTyping && !showReport) {
+      inputRef.current?.focus();
+    }
+  }, [isTyping, showReport]);
 //
   const fetchSituationDetails = async () => {
     try {
@@ -181,7 +196,6 @@ const SituationChat = ({ situations }) => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
-      inputRef.current.focus();
     }
   };
 
@@ -189,34 +203,11 @@ const SituationChat = ({ situations }) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleLogout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      navigate('/');
-    } catch (err) {
-      console.error('Error logging out:', err);
-    }
-  };
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  const calculateReport = () => {
-    const totalMessages = messages.length;
-    const userMessages = messages.filter(m => m.sender === 'user').length;
-    const botMessages = messages.filter(m => m.sender === 'bot').length;
-    
-    return {
-      totalMessages,
-      userMessages,
-      botMessages,
-      progress,
-      timeSpent: situationDetails.timer_in_minutes * 60 - timeLeft
-    };
   };
 
   const analyzeCommunicationStyle = async (messages) => {
@@ -237,7 +228,7 @@ const SituationChat = ({ situations }) => {
           if (jsonMatch) {
             metrics = JSON.parse(jsonMatch[0]);
           } else {
-            throw new Error('No valid JSON object found in response');
+            throw new Error(parseError);
           }
         }        
         // Validate the metrics object has all required fields
@@ -314,27 +305,6 @@ const SituationChat = ({ situations }) => {
     }
   };
 
-  const generateRecommendations = async (userMessages) => {
-    try {
-      const prompt = `Based on the following user messages, provide 2 specific recommendations to improve their communication skills. Focus on practical, actionable advice.
-
-User Messages:
-${userMessages.join('\n')}
-
-Provide the response addresed to the user in this exact format:
-{
-  "recommendation1": "First recommendation",
-  "recommendation2": "Second recommendation"
-}`;
-
-      const response = await generateChatResponse([], prompt);
-      const recommendations = JSON.parse(response);
-      return [recommendations.recommendation1, recommendations.recommendation2];
-    } catch (error) {
-      return ["Unable to generate recommendations", "Please try again later"];
-    }
-  };
-
   const [reportGenerated, setReportGenerated] = useState(false);
 
   const generateReport = async () => {
@@ -351,8 +321,8 @@ Provide the response addresed to the user in this exact format:
   }, [timeLeft, showReport]);
 
   const handleCloseReport = () => {
-    setMessages([]); // Clear messages when closing the report
-    navigate('/dashboard'); // Redirect to dashboard instead of chat
+    setMessages([]);
+    navigate('/dashboard');
   };
 
   if (!situationDetails) return <div>Loading situation...</div>;
