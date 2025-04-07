@@ -17,16 +17,7 @@ const SituationChat = ({ situations }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [showReport, setShowReport] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
-  const mockMode = true;
-  const [userProgress, setUserProgress] = useState(mockMode ? {
-    overall_success: 82,
-    assertive_percent: 65,
-    aggressive_percent: 10,
-    passive_percent: 25,
-    dialogue_good_points: "Mesajul 'Apreciez eforturile tale' a avut cel mai mare impact deoarece transmite empatie și colaborare.",
-    recommendation1: "În loc să spui 'Nu cred că e o idee bună', poți spune 'Cred că putem îmbunătăți ideea analizând alternativele'.",
-    recommendation2: "În loc să spui 'Nu mă interesează', poți spune 'Aș vrea să discutăm altă opțiune care mă atrage mai mult'."
-  } : null);
+  const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [evaluationTypes, setEvaluationTypes] = useState([]);
