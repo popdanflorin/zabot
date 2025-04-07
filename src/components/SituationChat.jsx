@@ -8,12 +8,15 @@ import './Dashboard.css';
 const SituationChat = ({ situations }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [message, setMessage] = useState('');
+  const [shouldRedirect, setShouldRedirect] = useState(false);
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [showTooFewMessagesWarning, setShowTooFewMessagesWarning] = useState(false);
   const [situationDetails, setSituationDetails] = useState(null);
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showReport, setShowReport] = useState(false);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
   const mockMode = true;
   const [userProgress, setUserProgress] = useState(mockMode ? {
     overall_success: 82,
@@ -203,6 +206,20 @@ const SituationChat = ({ situations }) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleEndNow = () => {
+    const userMessagesCount = messages.filter(m => m.sender === 'user').length;
+
+    if (userMessagesCount < 2) {
+      setShowEndConfirm(false);
+      setShowTooFewMessagesWarning(true);
+      setShouldRedirect(false);
+      return;
+    }
+    setShowEndConfirm(false);
+    setTimeLeft(0);
+    setShowReport(true);
+  }
+
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -316,6 +333,13 @@ const SituationChat = ({ situations }) => {
 
   useEffect(() => {
     if (timeLeft === 0 && showReport && !reportGenerated) {
+      const userMessagesCount = messages.filter(m => m.sender === 'user').length;
+
+      if (userMessagesCount < 2) {
+        setShowTooFewMessagesWarning(true);
+        setShouldRedirect(true);
+        return;
+      }
       generateReport();
     }
   }, [timeLeft, showReport]);
@@ -323,6 +347,13 @@ const SituationChat = ({ situations }) => {
   const handleCloseReport = () => {
     setMessages([]);
     navigate('/dashboard');
+  };
+
+  const handleTooFewMessagesOk = () => {
+    setShowTooFewMessagesWarning(false);
+    if (shouldRedirect) {
+      navigate('/dashboard');
+    }
   };
 
   if (!situationDetails) return <div>Loading situation...</div>;
@@ -363,53 +394,53 @@ const SituationChat = ({ situations }) => {
       </div>
       <div className="chat-content">
         <div className="chat-header">
-          <div 
-            className="timer" 
-            style={{ 
-              '--progress': `${(timeLeft / (situationDetails.timer_in_minutes * 60)) * 100}%` 
-            }}
+          <div
+              className="timer"
+              style={{
+                '--progress': `${(timeLeft / (situationDetails.timer_in_minutes * 60)) * 100}%`
+              }}
           >
             <span>{formatTime(timeLeft)}</span>
           </div>
           <h3>{situation?.headline || 'Loading...'}</h3>
         </div>
-        <div className="progress-bar">
-          <div
-            className="progress-fill"
-            style={{ width: `${progress}%` }}
-          />
-          <div className="progress-tooltip">
-            Progress: {progress}%
+        <div className="progress-bar-wrapper">
+          <button className="end-now-button" onClick={() => setShowEndConfirm(true)}>End Conversation</button>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{width: `${progress}%`}}/>
+            <div className="progress-tooltip">
+              Progres: {progress}%
+            </div>
           </div>
         </div>
         <div className="chat-area">
           {messages.map((msg) => (
-            <div key={msg.id} className={`message ${msg.sender}`}>
-              <div className="message-content">
-                {msg.text}
+              <div key={msg.id} className={`message ${msg.sender}`}>
+                <div className="message-content">
+                  {msg.text}
+                </div>
+                <div className="message-timestamp">
+                  {new Date(msg.timestamp).toLocaleTimeString()}
+                </div>
               </div>
-              <div className="message-timestamp">
-                {new Date(msg.timestamp).toLocaleTimeString()}
-              </div>
-            </div>
           ))}
           {isTyping && (
-            <div className="typing-indicator">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
+              <div className="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
           )}
-          <div ref={chatEndRef} />
+          <div ref={chatEndRef}/>
         </div>
         <form className="input-area" onSubmit={handleSendMessage}>
           <input
-            type="text"
-            ref={inputRef}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type your message..."
-            disabled={isTyping}
+              type="text"
+              ref={inputRef}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type your message..."
+              disabled={isTyping}
           />
           <button type="submit" disabled={isTyping || !message.trim()}>
             {isTyping ? situationDetails.bot_name + ' is typing...' : 'Send'}
@@ -421,42 +452,64 @@ const SituationChat = ({ situations }) => {
 
         {/* Report Popup */}
         {reportGenerated && (
-          <div className="report-overlay">
-            <div className="report-content">
-              <h2>Raport de Conversație</h2>
-              <div className="report-details">
-                <div className="metrics-section">
-                  <h3>Metrici de Comunicare</h3>
-                  <p>Progres General: {userProgress?.overall_success || 0}%</p>
-                  <p>Stil Asertiv: {userProgress?.assertive_percent || 0}%</p>
-                  <p>Stil Agresiv: {userProgress?.aggressive_percent || 0}%</p>
-                  <p>Stil Pasiv: {userProgress?.passive_percent || 0}%</p>
-                </div>
+            <div className="report-overlay">
+              <div className="report-content">
+                <h2>Raport de Conversație</h2>
+                <div className="report-details">
+                  <div className="metrics-section">
+                    <h3>Metrici de Comunicare</h3>
+                    <p>Progres General: {userProgress?.overall_success || 0}%</p>
+                    <p>Stil Asertiv: {userProgress?.assertive_percent || 0}%</p>
+                    <p>Stil Agresiv: {userProgress?.aggressive_percent || 0}%</p>
+                    <p>Stil Pasiv: {userProgress?.passive_percent || 0}%</p>
+                  </div>
 
-                <div className="good-points-section">
-                  <h3>Puncte Forte în Dialog</h3>
-                  <p>{userProgress?.dialogue_good_points}</p>
-                </div>
+                  <div className="good-points-section">
+                    <h3>Puncte Forte în Dialog</h3>
+                    <p>{userProgress?.dialogue_good_points}</p>
+                  </div>
 
-                <div className="recommendations-section">
-                  <h3>Recomandări pentru Îmbunătățire</h3>
-                  <ul>
-                    <li>{userProgress?.recommendation1}</li>
-                    <li>{userProgress?.recommendation2}</li>
-                  </ul>
+                  <div className="recommendations-section">
+                    <h3>Recomandări pentru Îmbunătățire</h3>
+                    <ul>
+                      <li>{userProgress?.recommendation1}</li>
+                      <li>{userProgress?.recommendation2}</li>
+                    </ul>
+                  </div>
                 </div>
+                <button
+                    className="continue-button"
+                    onClick={handleCloseReport}
+                >
+                  Închide
+                </button>
               </div>
-              <button 
-                className="continue-button"
-                onClick={handleCloseReport}
-              >
-                Închide
-              </button>
             </div>
-          </div>
         )}
       </div>
+      {showEndConfirm && (
+          <div className="confirm-overlay">
+            <div className="confirm-dialog">
+              <p>Are you sure you want to end the conversation now?</p>
+              <div className="confirm-buttons">
+                <button className="confirm-yes" onClick={handleEndNow}>YES</button>
+                <button className="confirm-no" onClick={() => setShowEndConfirm(false)}>CANCEL</button>
+              </div>
+            </div>
+          </div>
+      )}
+      {showTooFewMessagesWarning && (
+          <div className="confirm-overlay">
+            <div className="confirm-dialog">
+              <p>At least two messages are required to generate a conversation report.</p>
+              <div className="confirm-buttons">
+                <button className="confirm-yes" onClick={handleTooFewMessagesOk}>OK</button>
+              </div>
+            </div>
+          </div>
+      )}
     </div>
+
   );
 };
 
