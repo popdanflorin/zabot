@@ -36,6 +36,17 @@ body, #root {
   align-items: center;
   overflow: visible;
   border-right: 1px solid #404040;
+
+  @media (max-width: 768px) {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    display: block;
+    position: fixed;
+    z-index: 1;
+  }
 }
 
 .sidebar.closed {
@@ -169,6 +180,7 @@ body, #root {
   padding: 20px;
   height: 100vh;
   overflow: hidden;
+  
 }
 
 .dashboard-header {

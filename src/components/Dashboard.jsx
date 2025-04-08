@@ -5,7 +5,7 @@ import './Dashboard.css';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [reports, setReports] = useState([]);
   const [suggestedBots, setSuggestedBots] = useState([]);
   const [loading, setLoading] = useState(true);

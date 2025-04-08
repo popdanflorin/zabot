@@ -7,7 +7,7 @@ import femaleBotPicture from '../assets/female_bot_picture-Photoroom.png';
 
 const Bots = () => {
   const [user, setUser] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [bots, setBots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

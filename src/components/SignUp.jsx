@@ -13,6 +13,14 @@ const SignUpContainer = styled.div`
   margin: 0;
   padding: 20px;
   box-sizing: border-box;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 1em;
+  }
 `;
 
 const SignUpCard = styled.div`
@@ -24,6 +32,12 @@ const SignUpCard = styled.div`
   max-width: 1000px;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    box-shadow: none;
+    overflow-y: auto;
+  }
 `;
 
 const LeftSection = styled.div`
@@ -46,6 +60,11 @@ const LeftSection = styled.div`
     opacity: 0.1;
     z-index: 1;
   }
+
+  @media (max-width: 768px) {
+    padding: 40px 20px;
+    min-height: auto;
+  }
 `;
 
 const RightSection = styled.div`
@@ -59,6 +78,11 @@ const RightSection = styled.div`
   form {
     width: 100%;
   }
+  
+  @media (max-width: 768px) {
+    padding: 30px 20px;
+    min-height: auto;
+  }
 `;
 
 const WelcomeTitle = styled.h1`
@@ -66,6 +90,10 @@ const WelcomeTitle = styled.h1`
   margin-bottom: 20px;
   position: relative;
   z-index: 2;
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
 `;
 
 const WelcomeText = styled.p`
@@ -75,6 +103,11 @@ const WelcomeText = styled.p`
   opacity: 0.9;
   position: relative;
   z-index: 2;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
 `;
 
 const Title = styled.h2`
