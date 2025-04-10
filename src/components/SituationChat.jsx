@@ -6,7 +6,7 @@ import './SituationChat.css';
 import './Dashboard.css';
 
 const SituationChat = ({ situations }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [messages, setMessages] = useState([]);
