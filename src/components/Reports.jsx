@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
+import { Calendar } from 'lucide-react';
 
 const Reports = () => {
   const [user, setUser] = useState(null);
@@ -66,7 +67,7 @@ const Reports = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleString('ro-RO', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -141,16 +142,24 @@ const Reports = () => {
                   <div key={report.id} className="bot-card">
                     <div className="bot-card-content">
                       <div className="bot-card-header">
-                        <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
-                        <span 
-                          className="difficulty-badge"
-                          style={{ backgroundColor: getSuccessColor(report.overall_success) }}
+                        <div className="bot-info">
+                          <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
+                          <div className="report-date">
+                            <Calendar size={14} style={{marginRight: '6px'}}/>
+                            {formatDate(report.completed_at)}
+                          </div>
+                        </div>
+
+                        <span
+                            className="difficulty-badge"
+                            style={{backgroundColor: getSuccessColor(report.overall_success)}}
                         >
                           {report.overall_success}% Success
                         </span>
                       </div>
                       <div className="report-details">
                         <div className="report-metrics">
+                          <h4>Communication Metrics:</h4>
                           <p>Assertive: {report.assertive_percent}%</p>
                           <p>Aggressive: {report.aggressive_percent}%</p>
                           <p>Passive: {report.passive_percent}%</p>
@@ -165,9 +174,6 @@ const Reports = () => {
                             <li>{report.recommendation1}</li>
                             <li>{report.recommendation2}</li>
                           </ul>
-                        </div>
-                        <div className="report-date">
-                          Completed: {formatDate(report.completed_at)}
                         </div>
                       </div>
                     </div>

@@ -4,16 +4,21 @@ import { supabase } from '../lib/supabaseClient';
 import { generateChatResponse } from '../lib/openai';
 import './SituationChat.css';
 import './Dashboard.css';
+import { pdf } from '@react-pdf/renderer'
+import ReportTable from './ReportToPdf.jsx';
+import ReportToPdf from "./ReportToPdf.jsx";
 
 const SituationChat = ({ situations }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [hasClickedInfo, setHasClickedInfo] = useState(false);
+  const [showObjectivesPopup, setShowObjectivesPopup] = useState(false);
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [showTooFewMessagesWarning, setShowTooFewMessagesWarning] = useState(false);
   const [situationDetails, setSituationDetails] = useState(null);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(100);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showReport, setShowReport] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
@@ -147,18 +152,19 @@ const SituationChat = ({ situations }) => {
     };
     setMessages(prev => [...prev, userMessage]);
 
-    let progressChange = 100 / situationDetails.max_messages;
 
     setProgress(prev => {
-      const newProgress = Math.min(Math.max(prev + progressChange, 0), 100);
-      // Check if we just reached 100%
-      if (newProgress === 100) {
+      const userMessagesCount = messages.filter(m => m.sender === 'user').length + 1;
+      const newProgress = Math.max(0, 100 - (userMessagesCount / situationDetails.max_messages) * 100);
+
+      if (newProgress === 0) {
         setShowReport(true);
         setTimeLeft(0);
       }
 
       return newProgress;
     });
+
 
     setMessage('');
     setIsTyping(true);
@@ -347,7 +353,40 @@ const SituationChat = ({ situations }) => {
     }
   };
 
+  const handleDownloadPdf = async () => {
+    const blob = await pdf(<ReportToPdf data={userProgress} />).toBlob();
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'raport_conversatie.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const getProgressColor = (progress) => {
+    if (progress > 60) return '#4CAF50'; // verde
+    if (progress > 30) return '#fbbf24'; // galben
+    return '#f87171'; // roșu
+  };
+
   if (!situationDetails) return <div>Loading situation...</div>;
+
+  const remaining = situationDetails.max_messages - messages.filter(m => m.sender === 'user').length;
+
+  const messageHint = remaining === 1
+      ? '⚠️ Ultimul mesaj disponibil!'
+      : remaining <= 0
+          ? '❌ Limită de mesaje atinsă'
+          : `💬 ${remaining} mesaje rămase din ${situationDetails.max_messages}`;
+
+  const messageHintClass = remaining <= 0
+      ? 'message-limit-indicator message-limit-danger'
+      : remaining === 1
+          ? 'message-limit-indicator message-limit-warning'
+          : 'message-limit-indicator';
+
+
 
   return (
     <div className="chat-container">
@@ -393,17 +432,39 @@ const SituationChat = ({ situations }) => {
           >
             <span>{formatTime(timeLeft)}</span>
           </div>
-          <h3>{situation?.headline || 'Loading...'}</h3>
+          <h3>
+            {situation?.headline || 'Loading...'}{' '}
+            <span
+                className={`info-icon ${!hasClickedInfo ? 'pulse-loop' : ''}`}
+                onClick={() => {
+                  setShowObjectivesPopup(true);
+                  setHasClickedInfo(true);
+                }}
+            >
+              ℹ️
+              <span className="tooltip">Vezi obiectivele conversației</span>
+            </span>
+          </h3>
+
         </div>
         <div className="progress-bar-wrapper">
-          <button className="end-now-button" onClick={() => setShowEndConfirm(true)}>End Conversation</button>
+          <div className={messageHintClass}>
+            {messageHint}
+          </div>
           <div className="progress-bar">
-            <div className="progress-fill" style={{width: `${progress}%`}}/>
+            <div
+                className="progress-fill"
+                style={{
+                  width: `${progress}%`,
+                  backgroundColor: getProgressColor(progress),
+                }}
+            />
             <div className="progress-tooltip">
               Progres: {progress}%
             </div>
           </div>
         </div>
+        <button className="end-now-button" onClick={() => setShowEndConfirm(true)}>End Conversation</button>
         <div className="chat-area">
           {messages.map((msg) => (
               <div key={msg.id} className={`message ${msg.sender}`}>
@@ -444,7 +505,7 @@ const SituationChat = ({ situations }) => {
         {/* Report Popup */}
         {reportGenerated && (
             <div className="report-overlay">
-              <div className="report-content">
+              <div className="report-content" id="report-content">
                 <h2>Raport de Conversație</h2>
                 <div className="report-details">
                   <div className="metrics-section">
@@ -468,6 +529,12 @@ const SituationChat = ({ situations }) => {
                     </ul>
                   </div>
                 </div>
+                <button
+                    className="download-button"
+                    onClick={handleDownloadPdf}
+                >
+                  Descarcă PDF
+                </button>
                 <button
                     className="continue-button"
                     onClick={handleCloseReport}
@@ -496,6 +563,15 @@ const SituationChat = ({ situations }) => {
               <div className="confirm-buttons">
                 <button className="confirm-yes" onClick={handleTooFewMessagesOk}>OK</button>
               </div>
+            </div>
+          </div>
+      )}
+      {showObjectivesPopup && (
+          <div className="objectives-modal-overlay" onClick={() => setShowObjectivesPopup(false)}>
+            <div className="objectives-modal" onClick={(e) => e.stopPropagation()}>
+              <h2>🎯 Obiective în această conversație</h2>
+              <p>{situationDetails?.objectives}</p>
+              <button onClick={() => setShowObjectivesPopup(false)}>Închide</button>
             </div>
           </div>
       )}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
+import { Calendar } from 'lucide-react'
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -82,11 +83,15 @@ const Dashboard = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    const options = {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
-    });
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+
+    return new Date(dateString).toLocaleString('ro-RO', options);
   };
 
   const getSuccessColor = (success) => {
@@ -174,7 +179,9 @@ const Dashboard = () => {
                     >
                       {report.overall_success}% Success
                     </span>
-                    <span className="report-date">{formatDate(report.completed_at)}</span>
+                    <span className="report-date">
+                      <Calendar size={14} style={{ marginRight: '6px' }} />
+                      {formatDate(report.completed_at)}</span>
                   </div>
                 ))
               )}

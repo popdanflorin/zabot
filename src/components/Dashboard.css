@@ -581,7 +581,7 @@ body, #root {
   flex-direction: column;
   gap: 12px;
   margin-top: 12px;
-  max-height: 300px;
+  max-height: 200px;
   overflow-y: auto;
   padding-bottom: 12px;
 }
@@ -604,6 +604,9 @@ body, #root {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  background-color: #2a2a2a;
+  padding: 10px;
+  border-radius: 6px;
 }
 
 .report-metrics p {
@@ -619,6 +622,7 @@ body, #root {
   border-radius: 6px;
 }
 
+.report-metrics h4,
 .report-good-points h4,
 .report-recommendations h4 {
   color: #4CAF50;
@@ -663,6 +667,24 @@ body, #root {
   margin-top: auto;
   padding-top: 8px;
   border-top: 1px solid #444;
+}
+
+.bot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bot-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.bot-info .report-date {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 2px;
 }
 
 .no-reports {

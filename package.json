@@ -15,7 +15,10 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@react-pdf/renderer": "^4.3.0",
     "@supabase/supabase-js": "^2.49.1",
+    "html2pdf.js": "^0.10.3",
+    "lucide-react": "^0.487.0",
     "openai": "^4.87.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
