@@ -160,12 +160,12 @@ const Reports = () => {
                       <div className="report-details">
                         <div className="report-metrics">
                           <h4>Metrici de comunicare:</h4>
-                          <p>Assertive: {report.assertive_percent}%</p>
-                          <p>Aggressive: {report.aggressive_percent}%</p>
-                          <p>Passive: {report.passive_percent}%</p>
+                          <p>Asertiv: {report.assertive_percent}%</p>
+                          <p>Agresiv: {report.aggressive_percent}%</p>
+                          <p>Pasiv: {report.passive_percent}%</p>
                         </div>
                         <div className="report-good-points">
-                          <h4>Functe Forte:</h4>
+                          <h4>Puncte Forte:</h4>
                           <p>{report.dialogue_good_points}</p>
                         </div>
                         <div className="report-recommendations">
