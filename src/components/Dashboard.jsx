@@ -136,13 +136,13 @@ const Dashboard = () => {
               className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
               onClick={() => navigate('/bots')}
             >
-              Bots
+              Situații
             </button>
             <button 
               className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
               onClick={() => navigate('/reports')}
             >
-              Reports
+              Rapoarte
             </button>
           </div>
         </div>
@@ -159,16 +159,16 @@ const Dashboard = () => {
         <div className="dashboard-content">
           <div className="reports-section">
             <div className="section-header">
-              <h2>Most Recent Reports</h2>
-              <a href="/zabot/reports" className="see-all-link">See All Reports</a>
+              <h2>Cele mai recente rapoarte</h2>
+              <a href="/zabot/reports" className="see-all-link">Vezi toate rapoartele</a>
             </div>
             <div className="reports-grid">
               {loading ? (
-                <div className="loading">Loading reports...</div>
+                <div className="loading">Se încarcă rapoartele...</div>
               ) : error ? (
-                <div className="error">Error loading reports: {error}</div>
+                <div className="error">Eroare la încărcarea rapoartelor: {error}</div>
               ) : reports.length === 0 ? (
-                <div className="no-reports">No reports available yet. Complete some situations to see your progress!</div>
+                <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi progresul tău!</div>
               ) : (
                 reports.map((report) => (
                   <div key={report.id} className="report-card">
@@ -188,8 +188,8 @@ const Dashboard = () => {
             </div>
 
             <div className="section-header" style={{ marginTop: '40px' }}>
-              <h2>Suggested Bots</h2>
-              <a href="/zabot/bots" className="see-all-link">See All Bots</a>
+              <h2>Situații sugerate</h2>
+              <a href="/zabot/bots" className="see-all-link">Vezi toate situațiile</a>
             </div>
             <div className="reports-grid">
               {suggestedBots.map((bot) => (

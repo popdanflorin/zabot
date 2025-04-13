@@ -189,7 +189,7 @@ const SituationChat = ({ situations }) => {
       console.error('Error getting bot response:', err);
       const errorMessage = {
         id: messages.length + 1,
-        text: "I apologize, but I'm having trouble responding right now. Please try again.",
+        text: "Îmi pare rău, dar am întâmpinat o eroare. Vă rugăm să încercați din nou.",
         sender: 'bot',
         timestamp: new Date().toISOString()
       };
@@ -216,7 +216,6 @@ const SituationChat = ({ situations }) => {
     setTimeLeft(0);
     setShowReport(true);
   }
-
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -261,10 +260,6 @@ const SituationChat = ({ situations }) => {
           throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
         }
         
-        // if (!Array.isArray(metrics.dialogue_good_points) || metrics.dialogue_good_points.length === 0) {
-        //   metrics.dialogue_good_points = ["No effective messages found in the conversation"];
-        // }
-        
         return metrics;
       } catch (parseError) {
         console.error('Error parsing analysis response:', parseError);
@@ -278,9 +273,9 @@ const SituationChat = ({ situations }) => {
         assertive_percent: 0,
         aggressive_percent: 0,
         passive_percent: 0,
-        dialogue_good_points: "Unable to analyze conversation",
-        recommendation1: "Unable to generate recommendations",
-        recommendation2: "Please try again later"
+        dialogue_good_points: "Nu s-a putut analiza conversația.",
+        recommendation1: "Nu s-au generat recomandări.",
+        recommendation2: "Încearcă din nou mai târziu."
       };
     }
   };
@@ -289,11 +284,6 @@ const SituationChat = ({ situations }) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      // Ensure arrays are properly formatted
-      // const dialoguePoints = Array.isArray(metrics.dialogue_good_points) 
-      //   ? metrics.dialogue_good_points 
-      //   : [];
 
       const { data, error } = await supabase
         .from('user_progress')
@@ -305,8 +295,8 @@ const SituationChat = ({ situations }) => {
           aggressive_percent: metrics.aggressive_percent,
           passive_percent: metrics.passive_percent,
           dialogue_good_points: metrics.dialogue_good_points,
-          recommendation1: metrics.recommendation1 || "No recommendation available",
-          recommendation2: metrics.recommendation2 || "No recommendation available",
+          recommendation1: metrics.recommendation1 || "Nu sunt recomandări disponibile",
+          recommendation2: metrics.recommendation2 || "Nu sunt recomandări disponibile",
           completed_at: new Date().toISOString()
         })
         .select()
@@ -377,16 +367,14 @@ const SituationChat = ({ situations }) => {
   const messageHint = remaining === 1
       ? '⚠️ Ultimul mesaj disponibil!'
       : remaining <= 0
-          ? '❌ Limită de mesaje atinsă'
-          : `💬 ${remaining} mesaje rămase din ${situationDetails.max_messages}`;
+          ? '❌   Limită de mesaje atinsă'
+          : `💬   ${remaining} mesaje rămase din ${situationDetails.max_messages}`;
 
   const messageHintClass = remaining <= 0
       ? 'message-limit-indicator message-limit-danger'
       : remaining === 1
           ? 'message-limit-indicator message-limit-warning'
           : 'message-limit-indicator';
-
-
 
   return (
     <div className="chat-container">
@@ -464,7 +452,7 @@ const SituationChat = ({ situations }) => {
             </div>
           </div>
         </div>
-        <button className="end-now-button" onClick={() => setShowEndConfirm(true)}>End Conversation</button>
+        <button className="end-now-button" onClick={() => setShowEndConfirm(true)}>Încheie conversația</button>
         <div className="chat-area">
           {messages.map((msg) => (
               <div key={msg.id} className={`message ${msg.sender}`}>
@@ -491,11 +479,11 @@ const SituationChat = ({ situations }) => {
               ref={inputRef}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message..."
+              placeholder="Scrie mesajul tau..."
               disabled={isTyping}
           />
           <button type="submit" disabled={isTyping || !message.trim()}>
-            {isTyping ? situationDetails.bot_name + ' is typing...' : 'Send'}
+            {isTyping ? situationDetails.bot_name + ' scrie...' : 'Trimite'}
           </button>
         </form>
         <div className="situation-description">
@@ -548,10 +536,10 @@ const SituationChat = ({ situations }) => {
       {showEndConfirm && (
           <div className="confirm-overlay">
             <div className="confirm-dialog">
-              <p>Are you sure you want to end the conversation now?</p>
+              <p>Ești sigur că vrei să închei conversația acum?</p>
               <div className="confirm-buttons">
-                <button className="confirm-yes" onClick={handleEndNow}>YES</button>
-                <button className="confirm-no" onClick={() => setShowEndConfirm(false)}>CANCEL</button>
+                <button className="confirm-yes" onClick={handleEndNow}>OK</button>
+                <button className="confirm-no" onClick={() => setShowEndConfirm(false)}>Renunță</button>
               </div>
             </div>
           </div>
@@ -559,7 +547,7 @@ const SituationChat = ({ situations }) => {
       {showTooFewMessagesWarning && (
           <div className="confirm-overlay">
             <div className="confirm-dialog">
-              <p>At least two messages are required to generate a conversation report.</p>
+              <p>Este nevoie de cel puțin 2 mesaje pentru a genera un raport.</p>
               <div className="confirm-buttons">
                 <button className="confirm-yes" onClick={handleTooFewMessagesOk}>OK</button>
               </div>

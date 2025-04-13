@@ -108,13 +108,13 @@ const Bots = () => {
               className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
               onClick={() => navigate('/bots')}
             >
-              Bots
+              Situații
             </button>
             <button 
               className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
               onClick={() => navigate('/reports')}
             >
-              Reports
+              Rapoarte
             </button>
           </div>
         </div>
@@ -122,7 +122,7 @@ const Bots = () => {
 
       <div className="main-content">
         <div className="dashboard-header">
-          <h1>Bots</h1>
+          <h1>Situații</h1>
           <button onClick={handleLogout} className="logout-button">
             Logout
           </button>
@@ -131,13 +131,13 @@ const Bots = () => {
         <div className="dashboard-content">
           <div className="reports-section">
             <div className="section-header">
-              <h2>Available Bots</h2>
+              <h2>Situații disponibile</h2>
             </div>
             <div className="bots-grid">
               {loading ? (
-                <div className="loading">Loading bots...</div>
+                <div className="loading">Încărcare situații...</div>
               ) : error ? (
-                <div className="error">Error loading bots: {error}</div>
+                <div className="error">Eroare încărcare situații: {error}</div>
               ) : (
                 bots.map((bot) => {
                   const difficulty = getDifficultyLabel(bot.difficulty);

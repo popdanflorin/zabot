@@ -105,13 +105,13 @@ const Reports = () => {
               className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
               onClick={() => navigate('/bots')}
             >
-              Bots
+              Situații
             </button>
             <button 
               className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
               onClick={() => navigate('/reports')}
             >
-              Reports
+              Rapoarte
             </button>
           </div>
         </div>
@@ -119,7 +119,7 @@ const Reports = () => {
 
       <div className="main-content">
         <div className="dashboard-header">
-          <h1>Reports</h1>
+          <h1>Rapoarte</h1>
           <button onClick={handleLogout} className="logout-button">
             Logout
           </button>
@@ -128,15 +128,15 @@ const Reports = () => {
         <div className="dashboard-content">
           <div className="reports-section">
             <div className="section-header">
-              <h2>Your Progress Reports</h2>
+              <h2>Rapoartele tale</h2>
             </div>
             <div className="bots-grid">
               {loading ? (
-                <div className="loading">Loading reports...</div>
+                <div className="loading">Se încarcă rapoartele...</div>
               ) : error ? (
-                <div className="error">Error loading reports: {error}</div>
+                <div className="error">Eroare la încărcarea rapoartelor: {error}</div>
               ) : reports.length === 0 ? (
-                <div className="no-reports">No reports available yet. Complete some situations to see your progress!</div>
+                <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi progresul tău!</div>
               ) : (
                 reports.map((report) => (
                   <div key={report.id} className="bot-card">
@@ -159,17 +159,17 @@ const Reports = () => {
                       </div>
                       <div className="report-details">
                         <div className="report-metrics">
-                          <h4>Communication Metrics:</h4>
+                          <h4>Metrici de comunicare:</h4>
                           <p>Assertive: {report.assertive_percent}%</p>
                           <p>Aggressive: {report.aggressive_percent}%</p>
                           <p>Passive: {report.passive_percent}%</p>
                         </div>
                         <div className="report-good-points">
-                          <h4>Good Points:</h4>
+                          <h4>Functe Forte:</h4>
                           <p>{report.dialogue_good_points}</p>
                         </div>
                         <div className="report-recommendations">
-                          <h4>Recommendations:</h4>
+                          <h4>Recomandări:</h4>
                           <ul>
                             <li>{report.recommendation1}</li>
                             <li>{report.recommendation2}</li>
