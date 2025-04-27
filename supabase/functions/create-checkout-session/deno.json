@@ -1,0 +1,8 @@
+{
+  "cors": {
+    "allow_origin": ["*"],
+    "allow_methods": ["POST", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization", "apikey", "x-client-info"]
+  },
+  "imports": {}
+}

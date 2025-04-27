@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
 import { Calendar } from 'lucide-react'
+import SubscribeButton from "./SubscribeButton.jsx";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -19,6 +20,8 @@ const Dashboard = () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
     };
+
+
 
     const fetchReports = async () => {
       try {
@@ -150,10 +153,12 @@ const Dashboard = () => {
 
       <div className="main-content">
         <div className="dashboard-header">
-          <h1>Dashboard</h1>
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
+          <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
+            <SubscribeButton/>
+            <button onClick={handleLogout} className="logout-button">
+              Logout
+            </button>
+          </div>
         </div>
 
         <div className="dashboard-content">

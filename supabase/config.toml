@@ -9,3 +9,36 @@ entrypoint = "./functions/chat-completion/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/chat-completion/*.html" ]
+
+[functions.stripe-webhooks]
+enabled = true
+verify_jwt = true
+import_map = "./functions/stripe-webhooks/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/stripe-webhooks/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/stripe-webhooks/*.html" ]
+
+[functions.create-checkout-session]
+enabled = true
+verify_jwt = true
+import_map = "./functions/create-checkout-session/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/create-checkout-session/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/create-checkout-session/*.html" ]
+
+[functions.stripe-create-customer]
+enabled = true
+verify_jwt = true
+import_map = "./functions/stripe-create-customer/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/stripe-create-customer/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/stripe-create-customer/*.html" ]
