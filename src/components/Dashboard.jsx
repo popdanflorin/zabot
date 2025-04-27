@@ -3,7 +3,6 @@ import { supabase } from '../lib/supabaseClient';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
 import { Calendar } from 'lucide-react'
-import SubscribeButton from "./SubscribeButton.jsx";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -154,7 +153,9 @@ const Dashboard = () => {
       <div className="main-content">
         <div className="dashboard-header">
           <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
-            <SubscribeButton/>
+            <button onClick={() => navigate('/subscriptions')} className="logout-button">
+              Abonează-te
+            </button>
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>

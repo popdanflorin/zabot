@@ -9,6 +9,7 @@ import Dashboard from './components/Dashboard';
 import SituationChat from './components/SituationChat';
 import Bots from './components/Bots';
 import Reports from './components/Reports';
+import SubscriptionsPage from "./components/SubscriptionsPage.jsx";
 
 // Move ProtectedRoute inside a separate component that has access to router hooks
 const ProtectedRouteWrapper = ({ children }) => {
@@ -163,7 +164,14 @@ function App() {
             </ProtectedRouteWrapper>
           } 
         />
-
+        <Route
+            path="/subscriptions"
+            element={
+              <ProtectedRouteWrapper>
+                <SubscriptionsPage />
+              </ProtectedRouteWrapper>
+            }
+        />
         {/* Catch all route - redirect to base path */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
