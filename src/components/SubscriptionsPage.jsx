@@ -1,6 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SubscriptionsPage.css";
+import { supabase } from "../lib/supabaseClient";
+
+const startCheckout = async (plan) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        alert("Trebuie să fii autentificat pentru a cumpăra un abonament.");
+        return;
+    }
+
+    const res = await fetch("https://yaltlxdrppiqlardcxwz.supabase.co/functions/v1/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            user_id: user.id,
+            plan, // 'pro' sau 'team'
+        }),
+    });
+
+    const data = await res.json();
+    if (data?.url) {
+        window.location.href = data.url; // redirecționează către Stripe
+    } else {
+        alert("Eroare la inițierea plății.");
+        console.error(data);
+    }
+};
 
 const featuresList = [
     { name: "2 boti easy (de încercare)", free: true, pro: true, team: true },
@@ -47,14 +73,18 @@ const SubscriptionsPage = () => {
                     <div className="badge badge-popular">Popular</div>
                     <h2>Pro</h2>
                     <p className="price">20$/lună</p>
-                    <button className="subscribe-plan-button">Abonează-te</button>
+                    <button className="subscribe-plan-button" onClick={() => startCheckout('pro')}>
+                        Abonează-te
+                    </button>
                 </div>
 
                 <div className="plan-option best-deal">
                     <div className="badge badge-bestdeal">Best Deal</div>
                     <h2>Team</h2>
                     <p className="price">100$/lună</p>
-                    <button className="subscribe-plan-button">Abonează-te</button>
+                    <button className="subscribe-plan-button" onClick={() => startCheckout('team')}>
+                        Abonează-te
+                    </button>
                 </div>
             </div>
 
