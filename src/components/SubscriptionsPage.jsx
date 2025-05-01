@@ -4,29 +4,35 @@ import "./SubscriptionsPage.css";
 import { supabase } from "../lib/supabaseClient";
 
 const startCheckout = async (plan) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-        alert("Trebuie să fii autentificat pentru a cumpăra un abonament.");
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+        alert("Trebuie să fii logat pentru a face o plată.");
         return;
     }
 
     const res = await fetch("https://yaltlxdrppiqlardcxwz.supabase.co/functions/v1/create-checkout-session", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`
+        },
         body: JSON.stringify({
-            user_id: user.id,
-            plan, // 'pro' sau 'team'
-        }),
+            user_id: session.user.id,
+            plan
+        })
     });
 
     const data = await res.json();
+
     if (data?.url) {
-        window.location.href = data.url; // redirecționează către Stripe
+        window.location.href = data.url;
     } else {
         alert("Eroare la inițierea plății.");
         console.error(data);
     }
 };
+
 
 const featuresList = [
     { name: "2 boti easy (de încercare)", free: true, pro: true, team: true },
