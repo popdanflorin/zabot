@@ -263,6 +263,12 @@ body, #root {
   padding: 10px 0;
   scrollbar-width: thin;
   scrollbar-color: #6c5ce7 #2d2d2d;
+
+  @media (max-width:768px){
+    flex-direction: column;
+    max-height: 40%;
+    margin-bottom: 10px;
+  }
 }
 
 .reports-grid::-webkit-scrollbar {
@@ -291,6 +297,12 @@ body, #root {
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  @media (max-width: 768px){
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .report-card:hover {
@@ -491,6 +503,10 @@ body, #root {
   padding-bottom: 40px;
   overflow-y: auto;
   flex: 1;
+
+  @media (max-width: 768px){
+    overflow-x: hidden;
+  }
 }
 
 .bots-grid::-webkit-scrollbar {
@@ -517,6 +533,13 @@ body, #root {
   flex-direction: column;
   border: 1px solid #444;
   cursor: pointer;
+
+  @media (max-width: 768px){
+    width:80%;
+    height: 340px;
+    margin-left:-15px;
+  }
+
 }
 
 .bot-card:hover {
