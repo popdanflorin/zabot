@@ -10,23 +10,43 @@ const Reports = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [accessType, setAccessType] = useState('free'); // 'free', 'trial', 'pro'
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const getUser = async () => {
+    const getUserAndAccess = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+  
+      if (user) {
+        const userCreatedAt = new Date(user.created_at);
+        const now = new Date();
+        const hoursSinceCreation = (now - userCreatedAt) / (1000 * 60 * 60);
+  
+        if (hoursSinceCreation <= 72) {
+          setAccessType('trial');
+        } else {
+          const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+  
+          if (subscription && subscription.status === 'active') {
+            setAccessType('pro');
+          } else {
+            setAccessType('free');
+          }
+        }
+      }
     };
-
+  
     const fetchReports = async () => {
       try {
         setLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
-        
         if (!user) throw new Error('No user found');
-
-        // Fetch user progress with situation details
         const { data: progressData, error: progressError } = await supabase
           .from('user_progress')
           .select(`
@@ -37,7 +57,7 @@ const Reports = () => {
           `)
           .eq('user_id', user.id)
           .order('completed_at', { ascending: false });
-
+  
         if (progressError) throw progressError;
         setReports(progressData);
       } catch (err) {
@@ -47,8 +67,8 @@ const Reports = () => {
         setLoading(false);
       }
     };
-
-    getUser();
+  
+    getUserAndAccess();
     fetchReports();
   }, []);
 
@@ -139,7 +159,7 @@ const Reports = () => {
                 <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi progresul tău!</div>
               ) : (
                 reports.map((report) => (
-                  <div key={report.id} className="bot-card">
+                  <div key={report.id} className={`bot-card${accessType === 'free' ? ' free-access' : ''}`}>
                     <div className="bot-card-content">
                       <div className="bot-card-header">
                         <div className="bot-info">
@@ -157,25 +177,27 @@ const Reports = () => {
                           {report.overall_success}% Success
                         </span>
                       </div>
-                      <div className="report-details">
-                        <div className="report-metrics">
-                          <h4>Metrici de comunicare:</h4>
-                          <p>Asertiv: {report.assertive_percent}%</p>
-                          <p>Agresiv: {report.aggressive_percent}%</p>
-                          <p>Pasiv: {report.passive_percent}%</p>
+                      {accessType === 'pro' || accessType === 'trial' ? (
+                        <div className="report-details">
+                          <div className="report-metrics">
+                            <h4>Metrici de comunicare:</h4>
+                            <p>Asertiv: {report.assertive_percent}%</p>
+                            <p>Agresiv: {report.aggressive_percent}%</p>
+                            <p>Pasiv: {report.passive_percent}%</p>
+                          </div>
+                          <div className="report-good-points">
+                            <h4>Puncte Forte:</h4>
+                            <p>{report.dialogue_good_points}</p>
+                          </div>
+                          <div className="report-recommendations">
+                            <h4>Recomandări:</h4>
+                            <ul>
+                              <li>{report.recommendation1}</li>
+                              <li>{report.recommendation2}</li>
+                            </ul>
+                          </div>
                         </div>
-                        <div className="report-good-points">
-                          <h4>Puncte Forte:</h4>
-                          <p>{report.dialogue_good_points}</p>
-                        </div>
-                        <div className="report-recommendations">
-                          <h4>Recomandări:</h4>
-                          <ul>
-                            <li>{report.recommendation1}</li>
-                            <li>{report.recommendation2}</li>
-                          </ul>
-                        </div>
-                      </div>
+                      ) : null}
                     </div>
                   </div>
                 ))

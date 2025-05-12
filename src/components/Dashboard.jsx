@@ -11,24 +11,42 @@ const Dashboard = () => {
   const [suggestedBots, setSuggestedBots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [accessType, setAccessType] = useState('free'); // 'free', 'trial', 'pro'
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const getUser = async () => {
+    const getUserAndAccess = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+
+      let nextAccessType = 'free';
+      if (user) {
+        const userCreatedAt = new Date(user.created_at);
+        const now = new Date();
+        const hoursSinceCreation = (now - userCreatedAt) / (1000 * 60 * 60);
+        if (hoursSinceCreation <= 72) {
+          nextAccessType = 'trial';
+        } else {
+          const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+          if (subscription && subscription.status === 'active') {
+            nextAccessType = 'pro';
+          }
+        }
+      }
+      setAccessType(nextAccessType);
+      return nextAccessType;
     };
-
-
 
     const fetchReports = async () => {
       try {
         setLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
-        
         if (!user) throw new Error('No user found');
-
         const { data: progressData, error: progressError } = await supabase
           .from('user_progress')
           .select(`
@@ -40,7 +58,6 @@ const Dashboard = () => {
           .eq('user_id', user.id)
           .order('completed_at', { ascending: false })
           .limit(5);
-
         if (progressError) throw progressError;
         setReports(progressData);
       } catch (err) {
@@ -51,13 +68,14 @@ const Dashboard = () => {
       }
     };
 
-    const fetchSuggestedBots = async () => {
+    const fetchSuggestedBots = async (accessType) => {
       try {
-        const { data, error } = await supabase
-          .from('situations')
-          .select('*')
-          .limit(5);
-
+        let query = supabase.from('situations').select('*');
+        if (accessType !== 'pro') {
+          query = query.in('id', [2, 3, 5]);
+        }
+        query = query.limit(5);
+        const { data, error } = await query;
         if (error) throw error;
         setSuggestedBots(data);
       } catch (err) {
@@ -65,9 +83,11 @@ const Dashboard = () => {
       }
     };
 
-    getUser();
-    fetchReports();
-    fetchSuggestedBots();
+    (async () => {
+      const at = await getUserAndAccess();
+      fetchReports();
+      fetchSuggestedBots(at);
+    })();
   }, []);
 
   const handleLogout = async () => {
@@ -156,6 +176,11 @@ const Dashboard = () => {
             <button onClick={() => navigate('/subscriptions')} className="logout-button">
               Abonează-te
             </button>
+            {(accessType === 'pro' || accessType === 'trial') && (
+              <button onClick={() => navigate('/leaderboard')} className="logout-button">
+                Leaderboard
+              </button>
+            )}
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>

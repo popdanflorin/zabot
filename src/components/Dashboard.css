@@ -719,3 +719,41 @@ body, #root {
   border-radius: 8px;
   border: 1px solid #444;
 }
+
+.upgrade-button {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upgrade-button:hover {
+  background-color: #4f46e5;
+}
+
+.upgrade-message {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #1e293b;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.upgrade-message p {
+  margin: 0;
+  color: #60a5fa;
+  font-weight: 500;
+}
+
+.bot-card.free-access {
+  height: 120px;
+  min-height: 100px;
+  max-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

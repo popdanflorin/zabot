@@ -11,19 +11,42 @@ const Bots = () => {
   const [bots, setBots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [accessType, setAccessType] = useState('free'); // 'free', 'trial', or 'pro'
+  const [totalBotsCount, setTotalBotsCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const getUser = async () => {
+    const getUserAndBots = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-    };
 
-    const fetchBots = async () => {
+      let nextAccessType = 'free';
+      if (user) {
+        const userCreatedAt = new Date(user.created_at);
+        const now = new Date();
+        const hoursSinceCreation = (now - userCreatedAt) / (1000 * 60 * 60);
+
+        if (hoursSinceCreation <= 72) {
+          nextAccessType = 'trial';
+        } else {
+          const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
+          if (subscription && subscription.status === 'active') {
+            nextAccessType = 'pro';
+          }
+        }
+      }
+      setAccessType(nextAccessType);
+
+      // Now fetch bots with the correct accessType
       try {
         setLoading(true);
-        const { data: situations, error: situationsError } = await supabase
+        let query = supabase
           .from('situations')
           .select(`
             id,
@@ -36,6 +59,11 @@ const Bots = () => {
           `)
           .order('difficulty');
 
+        if (nextAccessType !== 'pro') {
+          query = query.in('id', [2, 3, 5]);
+        }
+
+        const { data: situations, error: situationsError } = await query;
         if (situationsError) throw situationsError;
         setBots(situations);
       } catch (err) {
@@ -46,8 +74,26 @@ const Bots = () => {
       }
     };
 
-    getUser();
-    fetchBots();
+    getUserAndBots();
+  }, []);
+
+  // Fetch total bots count once
+  useEffect(() => {
+    const fetchTotalBotsCount = async () => {
+      const { data, error } = await supabase
+        .from('situations')
+        .select('id', { count: 'exact', head: true });
+      if (!error && data) {
+        setTotalBotsCount(data.length || 0);
+      } else if (!error && data === null) {
+        // If using count: 'exact', head: true, data is null, so fetch count from meta
+        const { count, error: countError } = await supabase
+          .from('situations')
+          .select('*', { count: 'exact', head: true });
+        if (!countError) setTotalBotsCount(count || 0);
+      }
+    };
+    fetchTotalBotsCount();
   }, []);
 
   const handleLogout = async () => {
@@ -83,6 +129,10 @@ const Bots = () => {
 
   const handleBotClick = (botId) => {
     navigate(`/situation/${botId}`);
+  };
+
+  const navigateToSubscriptions = () => {
+    navigate('/subscriptions');
   };
 
   return (
@@ -123,15 +173,31 @@ const Bots = () => {
       <div className="main-content">
         <div className="dashboard-header">
           <h1>Situații</h1>
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            {accessType !== 'pro' && (
+              <button onClick={navigateToSubscriptions} className="upgrade-button">
+                Upgrade to Pro
+              </button>
+            )}
+            <button onClick={handleLogout} className="logout-button">
+              Logout
+            </button>
+          </div>
         </div>
 
         <div className="dashboard-content">
           <div className="reports-section">
             <div className="section-header">
               <h2>Situații disponibile</h2>
+              {accessType !== 'pro' && (
+                <div className="upgrade-message">
+                  {accessType === 'trial' ? (
+                    <p>You're in trial period! Upgrade to Pro to unlock all bots.</p>
+                  ) : (
+                    <p>Unlock {Math.max(totalBotsCount - 3, 0)} more bots by upgrading to Pro!</p>
+                  )}
+                </div>
+              )}
             </div>
             <div className="bots-grid">
               {loading ? (
