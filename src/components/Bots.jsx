@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
 import maleBotPicture from '../assets/male_bot_picture-Photoroom.png';
 import femaleBotPicture from '../assets/female_bot_picture-Photoroom.png';
+import logo from "../assets/Verbo-nbg-dashboard.png";
 
 const Bots = () => {
   const [user, setUser] = useState(null);
@@ -171,13 +172,24 @@ const Bots = () => {
       </div>
 
       <div className="main-content">
-        <div className="dashboard-header">
+        <div className="dashboard-header"
+             style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          <img
+              src={logo}
+              alt="VERBO Logo"
+              style={{height: '150px', marginLeft: '20px'}}
+          />
           <h1>Situații</h1>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            {accessType !== 'pro' && (
-              <button onClick={navigateToSubscriptions} className="upgrade-button">
-                Upgrade to Pro
+          <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
+            {(accessType !== 'pro') && (
+              <button onClick={() => navigate('/subscriptions')} className="logout-button">
+                Abonează-te
               </button>
+            )}
+            {(accessType === 'pro' || accessType === 'trial') && (
+                <button onClick={() => navigate('/leaderboard')} className="logout-button">
+                  Leaderboard
+                </button>
             )}
             <button onClick={handleLogout} className="logout-button">
               Logout
@@ -190,52 +202,52 @@ const Bots = () => {
             <div className="section-header">
               <h2>Situații disponibile</h2>
               {accessType !== 'pro' && (
-                <div className="upgrade-message">
-                  {accessType === 'trial' ? (
-                    <p>You're in trial period! Upgrade to Pro to unlock all bots.</p>
-                  ) : (
-                    <p>Unlock {Math.max(totalBotsCount - 3, 0)} more bots by upgrading to Pro!</p>
-                  )}
-                </div>
+                  <div className="upgrade-message">
+                    {accessType === 'trial' ? (
+                        <p>Ești în perioada de probă! Fă upgrade la Pro pentru a debloca toți boții.</p>
+                    ) : (
+                        <p>Deblochează încă {Math.max(totalBotsCount - 3, 0)} boți făcând upgrade la versiunea Pro!</p>
+                    )}
+                  </div>
               )}
             </div>
             <div className="bots-grid">
               {loading ? (
-                <div className="loading">Încărcare situații...</div>
+                  <div className="loading">Încărcare situații...</div>
               ) : error ? (
-                <div className="error">Eroare încărcare situații: {error}</div>
+                  <div className="error">Eroare încărcare situații: {error}</div>
               ) : (
-                bots.map((bot) => {
-                  const difficulty = getDifficultyLabel(bot.difficulty);
-                  return (
-                    <div 
-                      key={bot.id} 
-                      className="bot-card"
-                      onClick={() => handleBotClick(bot.id)}
-                    >
-                      <div className="bot-card-image">
-                        <img 
-                          src={getBotPicture(bot.gender)} 
-                          alt={`${bot.gender} bot`}
-                        />
-                      </div>
-                      <div className="bot-card-content">
-                        <div className="bot-card-header">
-                          <h3>{bot.bot_name}</h3>
-                          <span 
-                            className="difficulty-badge"
-                            style={{ backgroundColor: difficulty.color }}
-                          >
+                  bots.map((bot) => {
+                    const difficulty = getDifficultyLabel(bot.difficulty);
+                    return (
+                        <div
+                            key={bot.id}
+                            className="bot-card"
+                            onClick={() => handleBotClick(bot.id)}
+                        >
+                          <div className="bot-card-image">
+                            <img
+                                src={getBotPicture(bot.gender)}
+                                alt={`${bot.gender} bot`}
+                            />
+                          </div>
+                          <div className="bot-card-content">
+                            <div className="bot-card-header">
+                              <h3>{bot.bot_name}</h3>
+                              <span
+                                  className="difficulty-badge"
+                                  style={{backgroundColor: difficulty.color}}
+                              >
                             {difficulty.label}
                           </span>
+                            </div>
+                            <div className="bot-card-category">
+                              {bot.categories?.title || 'Uncategorized'}
+                            </div>
+                          </div>
                         </div>
-                        <div className="bot-card-category">
-                          {bot.categories?.title || 'Uncategorized'}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
+                    );
+                  })
               )}
             </div>
           </div>

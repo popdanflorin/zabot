@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { supabase } from '../lib/supabaseClient';
+import logo from "../assets/Verbo-nbg.png";
 
 const SignUpContainer = styled.div`
   display: flex;
@@ -415,117 +416,142 @@ const SignUp = () => {
           </WelcomeText>
         </LeftSection>
         <RightSection>
-          <Title>SIGN UP</Title>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px',
+            marginTop: '-40px',
+            marginLeft: '-10px',
+            width: '100%'
+          }}>
+            <img
+                src={logo}
+                alt="VERBO Logo"
+                style={{
+                  marginTop: '15px',
+                  height: '200px',
+                  objectFit: 'contain'
+                }}
+            />
+            <Title style={{margin: 0}}>SIGN UP</Title>
+          </div>
           {error && (
-            <ErrorMessage>{error}</ErrorMessage>
+              <ErrorMessage>{error}</ErrorMessage>
           )}
           <form onSubmit={handleSubmit}>
             <Input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={formData.name}
-              onChange={handleChange}
-              required
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                value={formData.name}
+                onChange={handleChange}
+                required
             />
             <Input
-              type="email"
-              name="email"
-              placeholder="Email Address"
-              value={formData.email}
-              onChange={handleChange}
-              required
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                required
             />
             <PhoneInputGroup>
               <CountrySelect
-                name="countryCode"
-                value={formData.countryCode}
-                onChange={handleChange}
+                  name="countryCode"
+                  value={formData.countryCode}
+                  onChange={handleChange}
               >
                 {countries.map((country) => (
-                  <CountryOption key={country.code} value={country.dialCode}>
-                    {country.code} {country.dialCode}
-                  </CountryOption>
+                    <CountryOption key={country.code} value={country.dialCode}>
+                      {country.code} {country.dialCode}
+                    </CountryOption>
                 ))}
               </CountrySelect>
               <PhoneInput
-                type="tel"
-                name="phone"
-                placeholder="Phone Number"
-                value={formData.phone}
-                onChange={handleChange}
-                required
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone Number"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
               />
             </PhoneInputGroup>
             <InputWrapper>
               <Input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                onFocus={() => setShowPasswordRequirements(true)}
-                onBlur={() => setShowPasswordRequirements(false)}
-                required
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  onFocus={() => setShowPasswordRequirements(true)}
+                  onBlur={() => setShowPasswordRequirements(false)}
+                  required
               />
               <PasswordToggle
-                type="button"
-                onClick={() => togglePasswordVisibility('password')}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                  type="button"
+                  onClick={() => togglePasswordVisibility('password')}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                  </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                      <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
                 )}
               </PasswordToggle>
             </InputWrapper>
             {showPasswordRequirements && (
-              <PasswordRequirements>
-                <RequirementItem met={hasLowercase(formData.password)}>
-                  At least one lowercase letter
-                </RequirementItem>
-                <RequirementItem met={hasUppercase(formData.password)}>
-                  At least one uppercase letter
-                </RequirementItem>
-                <RequirementItem met={hasDigit(formData.password)}>
-                  At least one number
-                </RequirementItem>
-                <RequirementItem met={hasSymbol(formData.password)}>
-                  At least one special character (!@#$%^&amp;*(),.?":{}|&lt;&gt;)
-                </RequirementItem>
-              </PasswordRequirements>
+                <PasswordRequirements>
+                  <RequirementItem met={hasLowercase(formData.password)}>
+                    At least one lowercase letter
+                  </RequirementItem>
+                  <RequirementItem met={hasUppercase(formData.password)}>
+                    At least one uppercase letter
+                  </RequirementItem>
+                  <RequirementItem met={hasDigit(formData.password)}>
+                    At least one number
+                  </RequirementItem>
+                  <RequirementItem met={hasSymbol(formData.password)}>
+                    At least one special character (!@#$%^&amp;*(),.?":{}|&lt;&gt;)
+                  </RequirementItem>
+                </PasswordRequirements>
             )}
             <InputWrapper>
               <Input
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
               />
               <PasswordToggle
-                type="button"
-                onClick={() => togglePasswordVisibility('confirmPassword')}
-                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  type="button"
+                  onClick={() => togglePasswordVisibility('confirmPassword')}
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
               >
                 {showConfirmPassword ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                  </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                      <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
                 )}
               </PasswordToggle>
             </InputWrapper>

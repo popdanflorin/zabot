@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { supabase } from '../lib/supabaseClient';
+import logo from "../assets/Verbo-nbg.png";
 
 const ForgotContainer = styled.div`
   display: flex;
@@ -239,12 +240,31 @@ const ForgotPassword = () => {
         <LeftSection>
           <WelcomeTitle>Reset Password</WelcomeTitle>
           <WelcomeText>
-            Don't worry! It happens to the best of us. Enter your email address and 
+            Don't worry! It happens to the best of us. Enter your email address and
             we'll send you instructions to reset your password.
           </WelcomeText>
         </LeftSection>
         <RightSection>
-          <Title>FORGOT PASSWORD</Title>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px',
+            marginTop: '-40px',
+            marginLeft: '-10px',
+            width: '100%'
+          }}>
+            <img
+                src={logo}
+                alt="VERBO Logo"
+                style={{
+                  marginTop: '15px',
+                  height: '200px',
+                  objectFit: 'contain'
+                }}
+            />
+            <Title style={{margin: 0}}>FORGOT PASSWORD</Title>
+          </div>
           <Subtitle>
             Enter your email address below and we'll send you a link to reset your password
           </Subtitle>
@@ -256,11 +276,11 @@ const ForgotPassword = () => {
           </ErrorMessage>
           <form onSubmit={handleSubmit}>
             <Input
-              type="email"
-              placeholder="Enter your email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
             />
             <Button type="submit" disabled={loading}>
               {loading ? 'Sending...' : 'SEND RESET LINK'}
