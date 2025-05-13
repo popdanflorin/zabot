@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
 import { Calendar } from 'lucide-react'
+import logo from "../assets/Verbo-nbg-dashboard.png";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -171,11 +172,20 @@ const Dashboard = () => {
       </div>
 
       <div className="main-content">
-        <div className="dashboard-header">
+        <div className="dashboard-header"
+             style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          <img
+              src={logo}
+              alt="VERBO Logo"
+              style={{height: '150px', marginLeft: '20px'}}
+          />
+          <h1>Dashboard</h1>
           <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
-            <button onClick={() => navigate('/subscriptions')} className="logout-button">
-              Abonează-te
-            </button>
+            {(accessType !== 'pro') && (
+                <button onClick={() => navigate('/subscriptions')} className="logout-button">
+                  Abonează-te
+                </button>
+            )}
             {(accessType === 'pro' || accessType === 'trial') && (
               <button onClick={() => navigate('/leaderboard')} className="logout-button">
                 Leaderboard
@@ -195,50 +205,51 @@ const Dashboard = () => {
             </div>
             <div className="reports-grid">
               {loading ? (
-                <div className="loading">Se încarcă rapoartele...</div>
+                  <div className="loading">Se încarcă rapoartele...</div>
               ) : error ? (
-                <div className="error">Eroare la încărcarea rapoartelor: {error}</div>
+                  <div className="error">Eroare la încărcarea rapoartelor: {error}</div>
               ) : reports.length === 0 ? (
-                <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi progresul tău!</div>
+                  <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi
+                    progresul tău!</div>
               ) : (
-                reports.map((report) => (
-                  <div key={report.id} className="report-card">
-                    <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
-                    <span 
-                      className="difficulty-badge"
-                      style={{ backgroundColor: getSuccessColor(report.overall_success) }}
-                    >
+                  reports.map((report) => (
+                      <div key={report.id} className="report-card">
+                        <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
+                        <span
+                            className="difficulty-badge"
+                            style={{backgroundColor: getSuccessColor(report.overall_success)}}
+                        >
                       {report.overall_success}% Success
                     </span>
-                    <span className="report-date">
-                      <Calendar size={14} style={{ marginRight: '6px' }} />
-                      {formatDate(report.completed_at)}</span>
-                  </div>
-                ))
+                        <span className="report-date">
+                      <Calendar size={14} style={{marginRight: '6px'}}/>
+                          {formatDate(report.completed_at)}</span>
+                      </div>
+                  ))
               )}
             </div>
 
-            <div className="section-header" style={{ marginTop: '40px' }}>
+            <div className="section-header" style={{marginTop: '40px'}}>
               <h2>Situații sugerate</h2>
               <a href="/zabot/bots" className="see-all-link">Vezi toate situațiile</a>
             </div>
             <div className="reports-grid">
               {suggestedBots.map((bot) => (
-                <div 
-                  key={bot.id} 
-                  className="report-card"
-                  onClick={() => navigate(`/situation/${bot.id}`)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <h3>{bot.bot_name}</h3>
-                  <span 
-                    className="difficulty-badge"
-                    style={{ backgroundColor: '#6c5ce7' }}
+                  <div
+                      key={bot.id}
+                      className="report-card"
+                      onClick={() => navigate(`/situation/${bot.id}`)}
+                      style={{cursor: 'pointer'}}
                   >
+                    <h3>{bot.bot_name}</h3>
+                    <span
+                        className="difficulty-badge"
+                        style={{backgroundColor: '#6c5ce7'}}
+                    >
                     {getDifficultyText(bot.difficulty)}
                   </span>
-                  <span className="report-date">{bot.category}</span>
-                </div>
+                    <span className="report-date">{bot.category}</span>
+                  </div>
               ))}
             </div>
           </div>

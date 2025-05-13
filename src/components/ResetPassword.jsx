@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { supabase } from '../lib/supabaseClient';
+import logo from "../assets/Verbo-nbg.png";
 
 const ResetContainer = styled.div`
   display: flex;
@@ -341,7 +342,26 @@ const ResetPassword = () => {
           </WelcomeText>
         </LeftSection>
         <RightSection>
-          <Title>RESET PASSWORD</Title>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px',
+            marginTop: '-40px',
+            marginLeft: '-10px',
+            width: '100%'
+          }}>
+            <img
+                src={logo}
+                alt="VERBO Logo"
+                style={{
+                  marginTop: '15px',
+                  height: '200px',
+                  objectFit: 'contain'
+                }}
+            />
+            <Title style={{margin: 0}}>RESET PASSWORD</Title>
+          </div>
           <Subtitle>
             Enter your new password below
           </Subtitle>
@@ -354,10 +374,10 @@ const ResetPassword = () => {
           <form onSubmit={handleSubmit}>
             <InputWrapper>
               <Input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="New Password"
-                value={formData.password}
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="New Password"
+                  value={formData.password}
                 onChange={handleChange}
                 onFocus={() => setShowPasswordRequirements(true)}
                 onBlur={() => setShowPasswordRequirements(false)}
