@@ -1,0 +1,82 @@
+.leaderboard-container {
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: #121212;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    color: #f1f1f1;
+  }
+  
+  /* Table */
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .leaderboard-table th {
+    background: #1e1e1e;
+    color: #aaa;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1rem;
+    text-align: left;
+  }
+  
+  .leaderboard-table td {
+    padding: 1.2rem;
+    border-bottom: 1px solid #2c2c2c;
+    vertical-align: middle;
+    font-size: 1rem;
+  }
+  
+  /* Row hover */
+  .leaderboard-table tbody tr:hover {
+    background: #232323;
+    transition: background 0.3s;
+  }
+  
+  /* Rank column */
+  .leaderboard-rank {
+    font-weight: bold;
+    width: 60px;
+    text-align: center;
+  }
+  
+  /* Highlight top 3 */
+  .leaderboard-rank.gold {
+    color: #ffd700;
+  }
+  .leaderboard-rank.silver {
+    color: #c0c0c0;
+  }
+  .leaderboard-rank.bronze {
+    color: #cd7f32;
+  }
+  
+  /* No data row */
+  .leaderboard-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+  }
+  
+  /* Fade-in animation */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .leaderboard-table tbody tr {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  /* Responsive */
+  @media (max-width: 600px) {
+    .leaderboard-table th, .leaderboard-table td {
+      padding: 0.8rem;
+      font-size: 0.9rem;
+    }
+  }

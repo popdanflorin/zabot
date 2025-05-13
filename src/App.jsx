@@ -10,6 +10,7 @@ import SituationChat from './components/SituationChat';
 import Bots from './components/Bots';
 import Reports from './components/Reports';
 import SubscriptionsPage from "./components/SubscriptionsPage.jsx";
+import Leaderboard from "./components/Leaderboard.jsx";
 
 // Move ProtectedRoute inside a separate component that has access to router hooks
 const ProtectedRouteWrapper = ({ children }) => {
@@ -169,6 +170,14 @@ function App() {
             element={
               <ProtectedRouteWrapper>
                 <SubscriptionsPage />
+              </ProtectedRouteWrapper>
+            }
+        />
+        <Route
+            path="/leaderboard"
+            element={
+              <ProtectedRouteWrapper>
+                <Leaderboard />
               </ProtectedRouteWrapper>
             }
         />
