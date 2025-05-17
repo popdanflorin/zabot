@@ -122,7 +122,7 @@ function App() {
   }
 
   return (
-    <Router basename="/zabot">
+    <Router basename="/">
       <Routes>
         {/* Public routes */}
         <Route path="" element={<Login />} />
