@@ -51,6 +51,9 @@ jobs:
           # Remove any source maps that might contain sensitive information
           find dist -name "*.map" -type f -delete
 
+      - name: Add CNAME file
+        run: echo "verbo.ro" > dist/CNAME
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
