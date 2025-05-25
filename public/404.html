@@ -7,7 +7,7 @@
       // Get the current path excluding the base path
       const path = window.location.pathname;
       // Store the full path in session storage
-      sessionStorage.setItem('redirect', path);
+      sessionStorage.setItem('redirect', path.replace(/^\//, ''));
       // Redirect to the base URL
       window.location.replace('/');
     </script>
