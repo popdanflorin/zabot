@@ -4,8 +4,11 @@
     <meta charset="utf-8">
     <title>Redirecting...</title>
     <script>
+      // Get the current path excluding the base path
       const path = window.location.pathname;
-      sessionStorage.setItem('redirect', path.replace(/^\//, ''));
+      // Store the full path in session storage
+      sessionStorage.setItem('redirect', path);
+      // Redirect to the base URL
       window.location.replace('/');
     </script>
   </head>
