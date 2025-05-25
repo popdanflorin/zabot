@@ -5,7 +5,7 @@
     <title>Redirecting...</title>
     <script>
       // Get the current path excluding the base path
-      const path = window.location.pathname.replace('/zabot/', '');
+      const path = window.location.pathname.replace('/', '');
       // Store the full path in session storage
       sessionStorage.setItem('redirect', path);
       // Redirect to the base URL
