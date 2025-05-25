@@ -35,8 +35,8 @@ const startCheckout = async (plan) => {
 
 
 const featuresList = [
-    { name: "2 boti easy (de încercare)", free: true, pro: true, team: true },
-    { name: "Acces la toți botii", free: false, pro: true, team: true },
+    { name: "3 situații easy (de încercare)", free: true, pro: true, team: true },
+    { name: "Acces la toate situațiile", free: false, pro: true, team: true },
     { name: "Raport de performanță", free: false, pro: true, team: true },
     { name: "Descarcare raport PDF", free: false, pro: true, team: true },
     { name: "Până la 10 utilizatori", free: false, pro: false, team: true },
@@ -71,14 +71,14 @@ const SubscriptionsPage = () => {
             <div className="pricing-buttons">
                 <div className="plan-option">
                     <h2>Free</h2>
-                    <p className="price">0$</p>
+                    <p className="price">0 RON</p>
                     <button className="subscribe-plan-button free" disabled>Activ Automat</button>
                 </div>
 
                 <div className="plan-option popular">
                     <div className="badge badge-popular">Popular</div>
                     <h2>Pro</h2>
-                    <p className="price">20$/lună</p>
+                    <p className="price">49 RON/lună</p>
                     <button className="subscribe-plan-button" onClick={() => startCheckout('pro')}>
                         Abonează-te
                     </button>
@@ -87,7 +87,7 @@ const SubscriptionsPage = () => {
                 <div className="plan-option best-deal">
                     <div className="badge badge-bestdeal">Best Deal</div>
                     <h2>Team</h2>
-                    <p className="price">100$/lună</p>
+                    <p className="price">350 RON/lună</p>
                     <button className="subscribe-plan-button" onClick={() => startCheckout('team')}>
                         Abonează-te
                     </button>

@@ -70,8 +70,8 @@ serve(async (req)=>{
         user_id,
         plan
       },
-      success_url: "https://popdanflorin.github.io/zabot/success",
-      cancel_url: "https://popdanflorin.github.io/zabot/cancel"
+      success_url: "https://verbo.ro/success",
+      cancel_url: "https://verbo.ro/cancel"
     });
     const planAmounts = {
       pro: 2000,

@@ -377,7 +377,7 @@ const SignUp = () => {
             name: formData.name,
             phone: `${formData.countryCode}${formData.phone}`,
           },
-          emailRedirectTo: `${window.location.origin}/zabot/`,
+          emailRedirectTo: `${window.location.origin}/`,
         },
       });
 

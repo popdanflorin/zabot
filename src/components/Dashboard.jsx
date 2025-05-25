@@ -201,7 +201,7 @@ const Dashboard = () => {
           <div className="reports-section">
             <div className="section-header">
               <h2>Cele mai recente rapoarte</h2>
-              <a href="/zabot/reports" className="see-all-link">Vezi toate rapoartele</a>
+              <a href="/reports" className="see-all-link">Vezi toate rapoartele</a>
             </div>
             <div className="reports-grid">
               {loading ? (
@@ -231,7 +231,7 @@ const Dashboard = () => {
 
             <div className="section-header" style={{marginTop: '40px'}}>
               <h2>Situații sugerate</h2>
-              <a href="/zabot/bots" className="see-all-link">Vezi toate situațiile</a>
+              <a href="/bots" className="see-all-link">Vezi toate situațiile</a>
             </div>
             <div className="reports-grid">
               {suggestedBots.map((bot) => (

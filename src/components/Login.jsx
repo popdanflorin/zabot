@@ -418,8 +418,8 @@ const Login = () => {
         provider: 'google',
         options: {
           redirectTo: window.location.hostname === 'localhost' 
-            ? 'http://localhost:5173/zabot/dashboard'
-            : 'https://popdanflorin.github.io/zabot/dashboard',
+            ? 'http://localhost:5173/dashboard'
+            : 'https://verbo.ro/dashboard',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',

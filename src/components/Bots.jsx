@@ -204,9 +204,9 @@ const Bots = () => {
               {accessType !== 'pro' && (
                   <div className="upgrade-message">
                     {accessType === 'trial' ? (
-                        <p>Ești în perioada de probă! Fă upgrade la Pro pentru a debloca toți boții.</p>
+                        <p>Ești în perioada de probă! Fă upgrade la Pro pentru a debloca toate situațiile.</p>
                     ) : (
-                        <p>Deblochează încă {Math.max(totalBotsCount - 3, 0)} boți făcând upgrade la versiunea Pro!</p>
+                        <p>Deblochează încă {Math.max(totalBotsCount - 3, 0)} situații făcând upgrade la versiunea Pro!</p>
                     )}
                   </div>
               )}
