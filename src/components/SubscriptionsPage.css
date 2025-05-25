@@ -132,12 +132,13 @@
     border: none;
     border-radius: 8px;
     font-weight: bold;
-    cursor: not-allowed;
+    cursor: pointer;
     transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 .subscribe-plan-button.free {
     background-color: #10b981;
+    cursor: not-allowed;
 }
 
 .subscribe-plan-button:hover {
