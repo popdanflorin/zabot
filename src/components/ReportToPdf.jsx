@@ -46,7 +46,7 @@ const ReportToPdf = ({ data }) => (
 
             <View style={styles.section}>
                 <Text style={styles.heading}>Metrici de Comunicare</Text>
-                <Text>Progres General: {data.overall_success}%</Text>
+                <Text>Succes General: {data.overall_success}%</Text>
                 <Text>Stil Asertiv: {data.assertive_percent}%</Text>
                 <Text>Stil Agresiv: {data.aggressive_percent}%</Text>
                 <Text>Stil Pasiv: {data.passive_percent}%</Text>

@@ -498,7 +498,7 @@ const SituationChat = ({ situations }) => {
                 <div className="report-details">
                   <div className="metrics-section">
                     <h3>Metrici de Comunicare</h3>
-                    <p>Progres General: {userProgress?.overall_success || 0}%</p>
+                    <p>Succces General: {userProgress?.overall_success || 0}%</p>
                     <p>Stil Asertiv: {userProgress?.assertive_percent || 0}%</p>
                     <p>Stil Agresiv: {userProgress?.aggressive_percent || 0}%</p>
                     <p>Stil Pasiv: {userProgress?.passive_percent || 0}%</p>
