@@ -146,6 +146,21 @@
     background-color: #4f46e5;
 }
 
+.subscribe-plan-button.cancel {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.subscribe-plan-button.cancel:hover {
+    background-color: #ff0000;
+}
+
 /* Comparison Table */
 .comparison-table {
     display: grid;

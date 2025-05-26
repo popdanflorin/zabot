@@ -136,6 +136,45 @@ const Dashboard = () => {
     }
   };
 
+  const cancelSubscription = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      alert("Trebuie să fii logat pentru a anula abonamentul.");
+      return;
+    }
+
+    if (!window.confirm("Ești sigur că vrei să anulezi abonamentul? Vei pierde accesul la funcționalitățile premium.")) {
+      return;
+    }
+
+    try {
+      const res = await fetch("https://yaltlxdrppiqlardcxwz.supabase.co/functions/v1/cancel-subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          user_id: session.user.id
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Abonamentul a fost anulat cu succes.");
+        window.location.reload();
+      } else {
+        alert("Eroare la anularea abonamentului.");
+        console.error(data);
+      }
+    } catch (error) {
+      alert("Eroare la anularea abonamentului.");
+      console.error(error);
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <button className="hamburger-button" onClick={toggleSidebar}>
@@ -192,6 +231,11 @@ const Dashboard = () => {
             {(accessType === 'pro' || accessType === 'trial') && (
               <button onClick={() => navigate('/leaderboard')} className="logout-button">
                 Leaderboard
+              </button>
+            )}
+            {accessType === 'pro' && (
+              <button onClick={cancelSubscription} className="logout-button cancel">
+                Anulează Abonamentul
               </button>
             )}
             <button onClick={handleLogout} className="logout-button">

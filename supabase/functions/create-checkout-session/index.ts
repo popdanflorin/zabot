@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std/http/server.ts";
 import Stripe from "https://esm.sh/stripe?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
-
 const stripe = new Stripe(Deno.env.get("STRIPE_API_KEY"), {
   apiVersion: "2022-11-15"
 });
@@ -16,7 +15,7 @@ serve(async (req)=>{
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type"
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
       }
     });
   }
@@ -24,7 +23,9 @@ serve(async (req)=>{
     return new Response("Method not allowed", {
       status: 405,
       headers: {
-        "Access-Control-Allow-Origin": "*"
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Methods": "POST, OPTIONS"
       }
     });
   }
@@ -39,18 +40,22 @@ serve(async (req)=>{
     }), {
       status: 400,
       headers: {
-        "Access-Control-Allow-Origin": "*"
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Methods": "POST, OPTIONS"
       }
     });
   }
-  const { user_id, plan } = body;
+  const { user_id, plan, email } = body;
   if (!user_id || !priceIds[plan]) {
     return new Response(JSON.stringify({
       error: "Invalid input"
     }), {
       status: 400,
       headers: {
-        "Access-Control-Allow-Origin": "*"
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Methods": "POST, OPTIONS"
       }
     });
   }
@@ -66,10 +71,13 @@ serve(async (req)=>{
           quantity: 1
         }
       ],
-      metadata: {
-        user_id,
-        plan
+      subscription_data: {
+        metadata: {
+          user_id,
+          plan
+        }
       },
+      customer_email: email,
       success_url: "https://verbo.ro/success",
       cancel_url: "https://verbo.ro/cancel"
     });
@@ -92,7 +100,9 @@ serve(async (req)=>{
       }), {
         status: 500,
         headers: {
-          "Access-Control-Allow-Origin": "*"
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          "Access-Control-Allow-Methods": "POST, OPTIONS"
         }
       });
     }
@@ -102,7 +112,7 @@ serve(async (req)=>{
       status: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Access-Control-Allow-Methods": "POST, OPTIONS"
       }
     });
@@ -113,7 +123,9 @@ serve(async (req)=>{
     }), {
       status: 500,
       headers: {
-        "Access-Control-Allow-Origin": "*"
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Methods": "POST, OPTIONS"
       }
     });
   }

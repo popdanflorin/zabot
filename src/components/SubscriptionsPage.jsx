@@ -33,7 +33,6 @@ const startCheckout = async (plan) => {
     }
 };
 
-
 const featuresList = [
     { name: "3 situații easy (de încercare)", free: true, pro: true, team: true },
     { name: "Acces la toate situațiile", free: false, pro: true, team: true },
@@ -67,7 +66,6 @@ const SubscriptionsPage = () => {
 
             <h1 className="page-title">Alege planul perfect pentru tine</h1>
 
-            {/* Secțiunea cu abonamente */}
             <div className="pricing-buttons">
                 <div className="plan-option">
                     <h2>Free</h2>
@@ -94,7 +92,6 @@ const SubscriptionsPage = () => {
                 </div>
             </div>
 
-            {/* Secțiunea cu tabel de comparație */}
             <h2 className="comparison-title">Ce oferă fiecare plan</h2>
 
             <div className="comparison-table">

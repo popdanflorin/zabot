@@ -34,13 +34,69 @@ serve(async (req)=>{
       }
       break;
     case "customer.subscription.updated":
-      console.log("Subscriere actualizată");
-      break;
+      {
+        const subscription = event.data.object;
+        const subscriptionId = subscription.id;
+        const customerId = subscription.customer;
+        const status = subscription.status;
+        const periodEnd = subscription.current_period_end;
+        const price = subscription.items.data[0]?.price;
+        const priceId = price?.id ?? null;
+        const planName = price?.lookup_key ?? null;
+        const userId = subscription.metadata?.user_id;
+        if (!userId) {
+          console.warn("⚠️ Lipsă user_id în metadata pentru subscription:", subscriptionId);
+          break;
+        }
+        const { error } = await supabase.from("subscriptions").upsert({
+          user_id: userId,
+          stripe_subscription_id: subscriptionId,
+          price_id: priceId,
+          plan_name: planName,
+          status: status,
+          current_period_end: new Date(periodEnd * 1000).toISOString()
+        }, {
+          onConflict: "stripe_subscription_id"
+        });
+        if (error) {
+          console.error("❌ Eroare la upsert în subscriptions:", error.message);
+        } else {
+          console.log("✅ Subscription sincronizat:", subscriptionId);
+        }
+        break;
+      }
     case "invoice.paid":
-      console.log("Factură plătită");
-      break;
-    default:
-      console.log(`Eveniment neacoperit: ${event.type}`);
+      {
+        const invoice = event.data.object;
+        const subscriptionId = invoice.subscription;
+        const customerId = invoice.customer;
+        const line = invoice.lines?.data?.[0];
+        const periodEnd = line?.period?.end;
+        const periodEndDate = periodEnd ? new Date(periodEnd * 1000).toISOString() : null;
+        const priceId = line?.price?.id ?? null;
+        const planName = line?.price?.lookup_key ?? null;
+        const userId = invoice.lines?.data?.[0]?.metadata?.user_id ?? invoice.metadata?.user_id;
+        if (!userId) {
+          console.warn("⚠️ Lipsă user_id în metadata pentru invoice:", invoice.id);
+          break;
+        }
+        const { data, error } = await supabase.from("subscriptions").upsert({
+          user_id: userId,
+          stripe_subscription_id: subscriptionId,
+          price_id: priceId,
+          plan_name: planName,
+          status: "active",
+          current_period_end: periodEndDate
+        }, {
+          onConflict: "stripe_subscription_id"
+        }).select();
+        if (error) {
+          console.error("❌ Eroare la upsert în subscriptions (invoice):", error.message);
+        } else {
+          console.log("✅ Subscription actualizat din invoice.paid:", subscriptionId);
+        }
+        break;
+      }
   }
   return new Response("ok", {
     status: 200

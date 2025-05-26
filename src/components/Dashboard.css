@@ -207,6 +207,44 @@ body, #root {
   }
 }
 
+@media (max-width: 600px) {
+  .dashboard-header {
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 16px !important;
+    gap: 12px !important;
+    text-align: center;
+  }
+  .dashboard-header img {
+    margin-left: 0 !important;
+    height: 90px !important;
+  }
+  .dashboard-header h1 {
+    font-size: 1.3rem !important;
+    margin: 0 !important;
+  }
+  .dashboard-header > div {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100%;
+  }
+  .plan-badge {
+    margin-bottom: 6px;
+    font-size: 1rem !important;
+    width: 100%;
+    display: block;
+  }
+  .logout-button, .logout-button.cancel {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 1rem !important;
+    margin: 0 !important;
+    padding: 12px 0 !important;
+    border-radius: 8px !important;
+  }
+}
+
 .dashboard-header h1 {
   color: #ffffff;
   font-size: 24px;
@@ -226,6 +264,22 @@ body, #root {
 
 .logout-button:hover {
   background-color: #5f3dc4;
+  transform: translateY(-1px);
+}
+
+.logout-button.cancel {
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.logout-button.cancel:hover {
+  background-color: #ff0000;
   transform: translateY(-1px);
 }
 
