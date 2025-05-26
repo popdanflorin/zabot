@@ -181,6 +181,9 @@ const Dashboard = () => {
           />
           <h1>Dashboard</h1>
           <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
+              <span className="plan-badge">
+                {accessType === 'pro' ? 'Plan: PRO' : accessType === 'trial' ? 'Plan: TRIAL' : 'Plan: FREE'}
+              </span>
             {(accessType !== 'pro') && (
                 <button onClick={() => navigate('/subscriptions')} className="logout-button">
                   Abonează-te
