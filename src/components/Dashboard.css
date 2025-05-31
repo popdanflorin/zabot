@@ -852,3 +852,10 @@ body, #root {
   background-color: #d1d5db;
   color: #111;
 }
+
+.user-name {
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

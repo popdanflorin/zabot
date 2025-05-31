@@ -16,6 +16,17 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserName(user?.user_metadata?.full_name || user?.email);
+    };
+
+    fetchUser();
+  }, []);
+
   useEffect(() => {
     const getUserAndAccess = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -220,6 +231,9 @@ const Dashboard = () => {
           />
           <h1>Dashboard</h1>
           <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
+              <span className="user-name">
+                <span role="img" aria-label="user">🙍‍♂️</span> {userName}
+              </span>
               <span className="plan-badge">
                 {accessType === 'pro' ? 'Plan: PRO' : accessType === 'trial' ? 'Plan: TRIAL' : 'Plan: FREE'}
               </span>
