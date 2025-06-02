@@ -266,8 +266,8 @@ const Dashboard = () => {
           <h1>Dashboard</h1>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <span className="user-name" style={{ display: "inline-block" }}>
-                <span role="img" aria-label="user">🙍‍♂️</span> {userName}
+              <span className="user-name">
+                🙍‍♂️ {userName}
               </span>
               <span className="plan-badge">
                 {accessType === 'pro' ? 'Plan: PRO' : accessType === 'trial' ? 'Plan: TRIAL' : 'Plan: FREE'}
