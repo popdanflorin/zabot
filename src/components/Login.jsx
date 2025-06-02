@@ -419,7 +419,7 @@ const Login = () => {
         options: {
           redirectTo: window.location.hostname === 'localhost' 
             ? 'http://localhost:5173/dashboard'
-            : 'https://verbo.ro/dashboard',
+            : 'https://yaltlxdrppiqlardcxwz.supabase.co/auth/v1/callback',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
