@@ -15,8 +15,11 @@ const Dashboard = () => {
   const [accessType, setAccessType] = useState('free'); // 'free', 'trial', 'pro'
   const navigate = useNavigate();
   const location = useLocation();
-
   const [userName, setUserName] = useState('');
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -186,6 +189,37 @@ const Dashboard = () => {
     }
   };
 
+  const submitFeedback = async () => {
+    if (!feedback.trim()) return;
+
+    setSubmittingFeedback(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { error } = await supabase.from('user_feedback').insert([
+        {
+          user_id: user.id,
+          feedback: feedback
+        }
+      ]);
+
+      if (error) throw error;
+
+      setFeedback('');
+      setFeedbackSent(true);
+      setTimeout(() => {
+        setFeedbackSent(false);
+        setFeedbackOpen(false);
+      }, 2500);
+    } catch (err) {
+      console.error("Error submitting feedback:", err);
+      alert("A apărut o eroare la trimiterea feedback-ului.");
+    } finally {
+      setSubmittingFeedback(false);
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <button className="hamburger-button" onClick={toggleSidebar}>
@@ -199,19 +233,19 @@ const Dashboard = () => {
       <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-content">
           <div className="nav-buttons">
-            <button 
+            <button
               className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard')}
             >
               Dashboard
             </button>
-            <button 
+            <button
               className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
               onClick={() => navigate('/bots')}
             >
               Situații
             </button>
-            <button 
+            <button
               className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
               onClick={() => navigate('/reports')}
             >
@@ -223,24 +257,24 @@ const Dashboard = () => {
 
       <div className="main-content">
         <div className="dashboard-header"
-             style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <img
-              src={logo}
-              alt="VERBO Logo"
-              style={{height: '150px', marginLeft: '20px'}}
+            src={logo}
+            alt="VERBO Logo"
+            style={{ height: '150px', marginLeft: '20px' }}
           />
           <h1>Dashboard</h1>
-          <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
-              <span className="user-name">
-                <span role="img" aria-label="user">🙍‍♂️</span> {userName}
-              </span>
-              <span className="plan-badge">
-                {accessType === 'pro' ? 'Plan: PRO' : accessType === 'trial' ? 'Plan: TRIAL' : 'Plan: FREE'}
-              </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span className="user-name">
+              <span role="img" aria-label="user">🙍‍♂️</span> {userName}
+            </span>
+            <span className="plan-badge">
+              {accessType === 'pro' ? 'Plan: PRO' : accessType === 'trial' ? 'Plan: TRIAL' : 'Plan: FREE'}
+            </span>
             {(accessType !== 'pro') && (
-                <button onClick={() => navigate('/subscriptions')} className="logout-button">
-                  Abonează-te
-                </button>
+              <button onClick={() => navigate('/subscriptions')} className="logout-button">
+                Abonează-te
+              </button>
             )}
             {(accessType === 'pro' || accessType === 'trial') && (
               <button onClick={() => navigate('/leaderboard')} className="logout-button">
@@ -255,6 +289,9 @@ const Dashboard = () => {
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
+            <button onClick={() => setFeedbackOpen(true)} className="logout-button">
+              Feedback
+            </button>
           </div>
         </div>
 
@@ -266,56 +303,75 @@ const Dashboard = () => {
             </div>
             <div className="reports-grid">
               {loading ? (
-                  <div className="loading">Se încarcă rapoartele...</div>
+                <div className="loading">Se încarcă rapoartele...</div>
               ) : error ? (
-                  <div className="error">Eroare la încărcarea rapoartelor: {error}</div>
+                <div className="error">Eroare la încărcarea rapoartelor: {error}</div>
               ) : reports.length === 0 ? (
-                  <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi
-                    progresul tău!</div>
+                <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi
+                  progresul tău!</div>
               ) : (
-                  reports.map((report) => (
-                      <div key={report.id} className="report-card">
-                        <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
-                        <span
-                            className="difficulty-badge"
-                            style={{backgroundColor: getSuccessColor(report.overall_success)}}
-                        >
+                reports.map((report) => (
+                  <div key={report.id} className="report-card">
+                    <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
+                    <span
+                      className="difficulty-badge"
+                      style={{ backgroundColor: getSuccessColor(report.overall_success) }}
+                    >
                       {report.overall_success}% Success
                     </span>
-                        <span className="report-date">
-                      <Calendar size={14} style={{marginRight: '6px'}}/>
-                          {formatDate(report.completed_at)}</span>
-                      </div>
-                  ))
+                    <span className="report-date">
+                      <Calendar size={14} style={{ marginRight: '6px' }} />
+                      {formatDate(report.completed_at)}</span>
+                  </div>
+                ))
               )}
             </div>
 
-            <div className="section-header" style={{marginTop: '40px'}}>
+            <div className="section-header" style={{ marginTop: '40px' }}>
               <h2>Situații sugerate</h2>
               <a href="/bots" className="see-all-link">Vezi toate situațiile</a>
             </div>
             <div className="reports-grid">
               {suggestedBots.map((bot) => (
-                  <div
-                      key={bot.id}
-                      className="report-card"
-                      onClick={() => navigate(`/situation/${bot.id}`)}
-                      style={{cursor: 'pointer'}}
+                <div
+                  key={bot.id}
+                  className="report-card"
+                  onClick={() => navigate(`/situation/${bot.id}`)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <h3>{bot.bot_name}</h3>
+                  <span
+                    className="difficulty-badge"
+                    style={{ backgroundColor: '#6c5ce7' }}
                   >
-                    <h3>{bot.bot_name}</h3>
-                    <span
-                        className="difficulty-badge"
-                        style={{backgroundColor: '#6c5ce7'}}
-                    >
                     {getDifficultyText(bot.difficulty)}
                   </span>
-                    <span className="report-date">{bot.category}</span>
-                  </div>
+                  <span className="report-date">{bot.category}</span>
+                </div>
               ))}
             </div>
           </div>
         </div>
       </div>
+      {feedbackOpen && (
+        <div className="feedback-modal-overlay">
+          <div className="feedback-modal-content">
+            <h2>Lasă-ne un feedback 🙏</h2>
+            <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder="Scrie părerea ta despre aplicație sau sugestii de îmbunătățire..."
+            />
+            {feedbackSent && <p style={{ color: "lightgreen" }}>✅ Mulțumim pentru feedback!</p>}
+            <div>
+              <button onClick={submitFeedback} disabled={submittingFeedback}>
+                {submittingFeedback ? "Se trimite..." : "Trimite"}
+              </button>
+              <button onClick={() => setFeedbackOpen(false)}>Închide</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
