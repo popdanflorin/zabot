@@ -265,14 +265,16 @@ const Dashboard = () => {
           />
           <h1>Dashboard</h1>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <span className="user-name">
-              <span role="img" aria-label="user">🙍‍♂️</span> {userName}
-            </span>
-            <span className="plan-badge">
-              {accessType === 'pro' ? 'Plan: PRO' : accessType === 'trial' ? 'Plan: TRIAL' : 'Plan: FREE'}
-            </span>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <span className="user-name" style={{ display: "inline-block" }}>
+                <span role="img" aria-label="user">🙍‍♂️</span> {userName}
+              </span>
+              <span className="plan-badge">
+                {accessType === 'pro' ? 'Plan: PRO' : accessType === 'trial' ? 'Plan: TRIAL' : 'Plan: FREE'}
+              </span>
+            </div>
             {(accessType !== 'pro') && (
-              <button onClick={() => navigate('/subscriptions')} className="logout-button">
+              <button onClick={() => navigate('/subscriptions')} className="logout-button confirm">
                 Abonează-te
               </button>
             )}

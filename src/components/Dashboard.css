@@ -283,6 +283,22 @@ body, #root {
   transform: translateY(-1px);
 }
 
+.logout-button.confirm {
+  background-color: #319e31;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.logout-button.confirm:hover {
+  background-color: #10b981;
+  transform: translateY(-1px);
+}
+
 .dashboard-content {
   flex: 1;
   overflow: hidden;
@@ -826,31 +842,23 @@ body, #root {
 }
 
 .plan-badge {
-  padding: 4px 10px;
-  border-radius: 12px;
-  background-color: #e0e0e0;
+  border-radius: 16px;
+  background-color: transparent;
   font-weight: 600;
-  font-size: 14px;
-  color: #333;
+  font-size: 16px;
+  color: white;
+  margin-top: 2px;
 }
 
 .plan-badge::before {
   content: "⭐ ";
 }
 
-.plan-badge.pro {
-  background-color: #4ade80;
-  color: white;
-}
-
-.plan-badge.trial {
-  background-color: #facc15;
-  color: #000;
-}
-
+.plan-badge.pro,
+.plan-badge.trial,
 .plan-badge.free {
-  background-color: #d1d5db;
-  color: #111;
+  background-color: transparent;
+  color: white;
 }
 
 .user-name {
@@ -858,6 +866,8 @@ body, #root {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .feedback-modal-overlay {

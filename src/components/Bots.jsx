@@ -182,7 +182,7 @@ const Bots = () => {
           <h1>Situații</h1>
           <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
             {(accessType !== 'pro') && (
-              <button onClick={() => navigate('/subscriptions')} className="logout-button">
+              <button onClick={() => navigate('/subscriptions')} className="logout-button confirm">
                 Abonează-te
               </button>
             )}
