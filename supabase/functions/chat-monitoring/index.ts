@@ -31,11 +31,11 @@ serve(async (req)=>{
       messages: [
         systemMessage,
         ...messages.map((msg)=>({
-            role: msg.sender === 'user' ? 'user' : 'assistant',
+            role: "user",
             content: msg.text
           }))
       ],
-      temperature: 0.7,
+      temperature: 0.2,
       max_tokens: 1000
     });
     return new Response(JSON.stringify({

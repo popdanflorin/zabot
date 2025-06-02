@@ -229,7 +229,8 @@ const SituationChat = ({ situations }) => {
 
       const conversationContext = evaluationTypes[0].prompt; //TODO use the prompt on the user's subscription
 
-      const analysis = await generateMonitoring(messages, conversationContext);
+      const userMessages = messages.filter(msg => msg.sender === 'user');
+      const analysis = await generateMonitoring(userMessages, conversationContext);
       
       try {
         // Try to parse the JSON
