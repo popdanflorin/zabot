@@ -17,6 +17,23 @@ export const generateChatResponse = async (messages, situationContext) => {
   }
 };
 
+export const generateMonitoring = async (messages, situationContext) => {
+  try {
+    const { data, error } = await supabase.functions.invoke('chat-monitoring', {
+      body: {
+        messages,
+        situationContext
+      }
+    });
+
+    if (error) throw error;
+    return data.response || "I apologize, but I couldn't generate a response.";
+  } catch (error) {
+    console.error('Error generating chat response:', error);
+    throw new Error('Failed to generate response. Please try again.');
+  }
+};
+
 export const validateApiKey = async () => {
   try {
     const { data, error } = await supabase.functions.invoke('chat-completion', {

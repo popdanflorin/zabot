@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { generateChatResponse } from '../lib/openai';
+import { generateMonitoring } from '../lib/openai';
 import './SituationChat.css';
 import './Dashboard.css';
 import { pdf } from '@react-pdf/renderer'
@@ -228,7 +229,7 @@ const SituationChat = ({ situations }) => {
 
       const conversationContext = evaluationTypes[0].prompt; //TODO use the prompt on the user's subscription
 
-      const analysis = await generateChatResponse(messages, conversationContext);
+      const analysis = await generateMonitoring(messages, conversationContext);
       
       try {
         // Try to parse the JSON
