@@ -12,7 +12,7 @@ const Dashboard = () => {
   const [suggestedBots, setSuggestedBots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [accessType, setAccessType] = useState('free'); // 'free', 'trial', 'pro'
+  const [accessType, setAccessType] = useState('free');
   const navigate = useNavigate();
   const location = useLocation();
   const [userName, setUserName] = useState('');
@@ -20,6 +20,9 @@ const Dashboard = () => {
   const [feedback, setFeedback] = useState('');
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [teamModalOpen, setTeamModalOpen] = useState(false);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [emailToAdd, setEmailToAdd] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -37,19 +40,22 @@ const Dashboard = () => {
 
       let nextAccessType = 'free';
       if (user) {
-        const userCreatedAt = new Date(user.created_at);
-        const now = new Date();
-        const hoursSinceCreation = (now - userCreatedAt) / (1000 * 60 * 60);
-        if (hoursSinceCreation <= 72) {
-          nextAccessType = 'trial';
-        } else {
-          const { data: subscription } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
-          if (subscription && subscription.status === 'active') {
-            nextAccessType = 'pro';
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (subscription && subscription.status === 'active') {
+          nextAccessType = subscription.plan_name;
+        }
+        else {
+          const userCreatedAt = new Date(user.created_at);
+          const now = new Date();
+          const hoursSinceCreation = (now - userCreatedAt) / (1000 * 60 * 60);
+          if (hoursSinceCreation <= 72) {
+            nextAccessType = 'trial';
           }
         }
       }
@@ -86,7 +92,7 @@ const Dashboard = () => {
     const fetchSuggestedBots = async (accessType) => {
       try {
         let query = supabase.from('situations').select('*');
-        if (accessType !== 'pro') {
+        if (['trial', 'free'].includes(accessType)) {
           query = query.in('id', [2, 3, 5]);
         }
         query = query.limit(5);
@@ -220,6 +226,95 @@ const Dashboard = () => {
     }
   };
 
+  const openTeamModal = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { data: currentSub } = await supabase
+        .from('subscriptions')
+        .select('stripe_subscription_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!currentSub) {
+        alert("Nu ai o subscripție activă de tip echipă.");
+        return;
+      }
+
+      const { data: members, error } = await supabase
+        .from('subscription_with_email')
+        .select('user_email')
+        .eq('subscription_id', currentSub.stripe_subscription_id);
+
+      if (error) throw error;
+
+      setTeamMembers(members || []);
+      setTeamModalOpen(true);
+    } catch (err) {
+      console.error('Eroare la încărcarea echipei:', err);
+      alert("A apărut o eroare.");
+    }
+  };
+
+  const handleAddTeamMember = async (emailToAdd) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { data: currentSub, error: subError } = await supabase
+        .from('subscriptions')
+        .select('stripe_subscription_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!currentSub || subError) {
+        alert("Nu ai o subscripție activă.");
+        return;
+      }
+
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', emailToAdd)
+        .single();
+
+      if (userError || !userData) {
+        alert("Nu există un utilizator cu acest email.");
+        return;
+      }
+
+      const userId = userData.id;
+
+      const { data: existing } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('stripe_subscription_id', currentSub.stripe_subscription_id);
+
+      if (existing?.length) {
+        alert("Utilizatorul este deja membru.");
+        return;
+      }
+
+      const { error: insertError } = await supabase
+        .from('subscriptions')
+        .insert({
+          user_id: userId,
+          stripe_subscription_id: currentSub.stripe_subscription_id,
+          plan_name: 'team pro',
+          status: 'active'
+        });
+
+      if (insertError) throw insertError;
+
+      setEmailToAdd(""); // curăță inputul
+      alert("Membru adăugat cu succes!");
+      openTeamModal(); // reîncarcă membrii
+    } catch (err) {
+      console.error("Eroare la adăugare:", err);
+      alert("Eroare la adăugarea membrului.");
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <button className="hamburger-button" onClick={toggleSidebar}>
@@ -270,20 +365,20 @@ const Dashboard = () => {
                 🙍‍♂️ {userName}
               </span>
               <span className="plan-badge">
-                {accessType === 'pro' ? 'Plan: PRO' : accessType === 'trial' ? 'Plan: TRIAL' : 'Plan: FREE'}
+                {`Plan: ${accessType.toUpperCase()}`}
               </span>
             </div>
-            {(accessType !== 'pro') && (
+            {(accessType === 'free' || accessType === 'trial') && (
               <button onClick={() => navigate('/subscriptions')} className="logout-button confirm">
                 Abonează-te
               </button>
             )}
-            {(accessType === 'pro' || accessType === 'trial') && (
+            {(accessType !== 'free') && (
               <button onClick={() => navigate('/leaderboard')} className="logout-button">
                 Leaderboard
               </button>
             )}
-            {accessType === 'pro' && (
+            {(accessType === 'pro' || accessType === 'team') && (
               <button onClick={cancelSubscription} className="logout-button cancel">
                 Anulează Abonamentul
               </button>
@@ -294,6 +389,11 @@ const Dashboard = () => {
             <button onClick={() => setFeedbackOpen(true)} className="logout-button">
               Feedback
             </button>
+            {accessType === 'team' && (
+              <button onClick={openTeamModal} className="logout-button">
+                Echipa mea
+              </button>
+            )}
           </div>
         </div>
 
@@ -370,6 +470,43 @@ const Dashboard = () => {
                 {submittingFeedback ? "Se trimite..." : "Trimite"}
               </button>
               <button onClick={() => setFeedbackOpen(false)}>Închide</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {teamModalOpen && (
+        <div className="feedback-modal-overlay">
+          <div className="feedback-modal-content">
+            <h2>Membrii echipei 🧑‍🤝‍🧑</h2>
+            <div style={{ display: "grid", gap: "8px", marginTop: "16px" }}>
+              {teamMembers.length > 0 ? (
+                teamMembers.map((member, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    value={member.user_email}
+                    readOnly
+                    style={{ width: '100%', padding: '8px' }}
+                  />
+                ))
+              ) : (
+                <p>Nu ai membri în echipă încă.</p>
+              )}
+            </div>
+
+            {/* Formular de adăugare */}
+            <div style={{ marginTop: "16px" }}>
+              <input
+                type="email"
+                placeholder="Email nou membru"
+                value={emailToAdd}
+                onChange={(e) => setEmailToAdd(e.target.value)}
+                style={{ padding: "8px", width: "100%", marginBottom: "8px" }}
+              />
+              <button onClick={() => handleAddTeamMember(emailToAdd)} style={{ marginRight: "8px" }}>
+                Adaugă membru
+              </button>
+              <button onClick={() => setTeamModalOpen(false)}>Închide</button>
             </div>
           </div>
         </div>

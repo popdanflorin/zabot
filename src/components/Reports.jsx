@@ -19,30 +19,31 @@ const Reports = () => {
     const getUserAndAccess = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-  
+
+      let nextAccessType = 'free';
       if (user) {
-        const userCreatedAt = new Date(user.created_at);
-        const now = new Date();
-        const hoursSinceCreation = (now - userCreatedAt) / (1000 * 60 * 60);
-  
-        if (hoursSinceCreation <= 72) {
-          setAccessType('trial');
-        } else {
-          const { data: subscription } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
-  
-          if (subscription && subscription.status === 'active') {
-            setAccessType('pro');
-          } else {
-            setAccessType('free');
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (subscription && subscription.status === 'active') {
+          nextAccessType = subscription.plan_name;
+        }
+        else {
+          const userCreatedAt = new Date(user.created_at);
+          const now = new Date();
+          const hoursSinceCreation = (now - userCreatedAt) / (1000 * 60 * 60);
+          if (hoursSinceCreation <= 72) {
+            nextAccessType = 'trial';
           }
         }
       }
+      setAccessType(nextAccessType);
     };
-  
+
     const fetchReports = async () => {
       try {
         setLoading(true);
@@ -58,7 +59,7 @@ const Reports = () => {
           `)
           .eq('user_id', user.id)
           .order('completed_at', { ascending: false });
-  
+
         if (progressError) throw progressError;
         setReports(progressData);
       } catch (err) {
@@ -68,7 +69,7 @@ const Reports = () => {
         setLoading(false);
       }
     };
-  
+
     getUserAndAccess();
     fetchReports();
   }, []);
@@ -116,19 +117,19 @@ const Reports = () => {
       <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-content">
           <div className="nav-buttons">
-            <button 
+            <button
               className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard')}
             >
               Dashboard
             </button>
-            <button 
+            <button
               className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
               onClick={() => navigate('/bots')}
             >
               Situații
             </button>
-            <button 
+            <button
               className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
               onClick={() => navigate('/reports')}
             >
@@ -140,24 +141,14 @@ const Reports = () => {
 
       <div className="main-content">
         <div className="dashboard-header"
-             style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <img
-              src={logo}
-              alt="VERBO Logo"
-              style={{height: '150px', marginLeft: '20px'}}
+            src={logo}
+            alt="VERBO Logo"
+            style={{ height: '150px', marginLeft: '20px' }}
           />
           <h1>Rapoarte</h1>
-          <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
-            {(accessType !== 'pro') && (
-                <button onClick={() => navigate('/subscriptions')} className="logout-button confirm">
-                  Abonează-te
-                </button>
-            )}
-            {(accessType === 'pro' || accessType === 'trial') && (
-                <button onClick={() => navigate('/leaderboard')} className="logout-button">
-                  Leaderboard
-                </button>
-            )}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
@@ -171,56 +162,56 @@ const Reports = () => {
             </div>
             <div className="bots-grid">
               {loading ? (
-                  <div className="loading">Se încarcă rapoartele...</div>
+                <div className="loading">Se încarcă rapoartele...</div>
               ) : error ? (
-                  <div className="error">Eroare la încărcarea rapoartelor: {error}</div>
+                <div className="error">Eroare la încărcarea rapoartelor: {error}</div>
               ) : reports.length === 0 ? (
-                  <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi
-                    progresul tău!</div>
+                <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi
+                  progresul tău!</div>
               ) : (
-                  reports.map((report) => (
-                      <div key={report.id} className={`bot-card${accessType === 'free' ? ' free-access' : ''}`}>
-                        <div className="bot-card-content">
-                          <div className="bot-card-header">
-                            <div className="bot-info">
-                              <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
-                              <div className="report-date">
-                                <Calendar size={14} style={{marginRight: '6px'}}/>
-                                {formatDate(report.completed_at)}
-                              </div>
-                            </div>
+                reports.map((report) => (
+                  <div key={report.id} className={`bot-card${accessType === 'free' ? ' free-access' : ''}`}>
+                    <div className="bot-card-content">
+                      <div className="bot-card-header">
+                        <div className="bot-info">
+                          <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
+                          <div className="report-date">
+                            <Calendar size={14} style={{ marginRight: '6px' }} />
+                            {formatDate(report.completed_at)}
+                          </div>
+                        </div>
 
-                            <span
-                                className="difficulty-badge"
-                                style={{backgroundColor: getSuccessColor(report.overall_success)}}
-                            >
+                        <span
+                          className="difficulty-badge"
+                          style={{ backgroundColor: getSuccessColor(report.overall_success) }}
+                        >
                           {report.overall_success}% Success
                         </span>
-                          </div>
-                          {accessType === 'pro' || accessType === 'trial' ? (
-                              <div className="report-details">
-                                <div className="report-metrics">
-                                  <h4>Metrici de comunicare:</h4>
-                                  <p>Asertiv: {report.assertive_percent}%</p>
-                                  <p>Agresiv: {report.aggressive_percent}%</p>
-                                  <p>Pasiv: {report.passive_percent}%</p>
-                                </div>
-                                <div className="report-good-points">
-                                  <h4>Puncte Forte:</h4>
-                                  <p>{report.dialogue_good_points}</p>
-                                </div>
-                                <div className="report-recommendations">
-                                  <h4>Recomandări:</h4>
-                                  <ul>
-                                    <li>{report.recommendation1}</li>
-                                    <li>{report.recommendation2}</li>
-                                  </ul>
-                                </div>
-                              </div>
-                          ) : null}
-                        </div>
                       </div>
-                  ))
+                      {accessType !== 'free' ? (
+                        <div className="report-details">
+                          <div className="report-metrics">
+                            <h4>Metrici de comunicare:</h4>
+                            <p>Asertiv: {report.assertive_percent}%</p>
+                            <p>Agresiv: {report.aggressive_percent}%</p>
+                            <p>Pasiv: {report.passive_percent}%</p>
+                          </div>
+                          <div className="report-good-points">
+                            <h4>Puncte Forte:</h4>
+                            <p>{report.dialogue_good_points}</p>
+                          </div>
+                          <div className="report-recommendations">
+                            <h4>Recomandări:</h4>
+                            <ul>
+                              <li>{report.recommendation1}</li>
+                              <li>{report.recommendation2}</li>
+                            </ul>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                ))
               )}
             </div>
           </div>

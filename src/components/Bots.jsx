@@ -24,21 +24,22 @@ const Bots = () => {
 
       let nextAccessType = 'free';
       if (user) {
-        const userCreatedAt = new Date(user.created_at);
-        const now = new Date();
-        const hoursSinceCreation = (now - userCreatedAt) / (1000 * 60 * 60);
-
-        if (hoursSinceCreation <= 72) {
-          nextAccessType = 'trial';
-        } else {
-          const { data: subscription } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
-
-          if (subscription && subscription.status === 'active') {
-            nextAccessType = 'pro';
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (subscription && subscription.status === 'active') {
+          nextAccessType = subscription.plan_name;
+        }
+        else {
+          const userCreatedAt = new Date(user.created_at);
+          const now = new Date();
+          const hoursSinceCreation = (now - userCreatedAt) / (1000 * 60 * 60);
+          if (hoursSinceCreation <= 72) {
+            nextAccessType = 'trial';
           }
         }
       }
@@ -60,7 +61,7 @@ const Bots = () => {
           `)
           .order('difficulty');
 
-        if (nextAccessType !== 'pro') {
+        if (nextAccessType === 'free' || nextAccessType === 'trial') {
           query = query.in('id', [2, 3, 5]);
         }
 
@@ -149,19 +150,19 @@ const Bots = () => {
       <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-content">
           <div className="nav-buttons">
-            <button 
+            <button
               className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard')}
             >
               Dashboard
             </button>
-            <button 
+            <button
               className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
               onClick={() => navigate('/bots')}
             >
               Situații
             </button>
-            <button 
+            <button
               className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
               onClick={() => navigate('/reports')}
             >
@@ -173,24 +174,14 @@ const Bots = () => {
 
       <div className="main-content">
         <div className="dashboard-header"
-             style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <img
-              src={logo}
-              alt="VERBO Logo"
-              style={{height: '150px', marginLeft: '20px'}}
+            src={logo}
+            alt="VERBO Logo"
+            style={{ height: '150px', marginLeft: '20px' }}
           />
           <h1>Situații</h1>
-          <div style={{display: "flex", alignItems: "center", gap: "12px"}}>
-            {(accessType !== 'pro') && (
-              <button onClick={() => navigate('/subscriptions')} className="logout-button confirm">
-                Abonează-te
-              </button>
-            )}
-            {(accessType === 'pro' || accessType === 'trial') && (
-                <button onClick={() => navigate('/leaderboard')} className="logout-button">
-                  Leaderboard
-                </button>
-            )}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
@@ -202,52 +193,52 @@ const Bots = () => {
             <div className="section-header">
               <h2>Situații disponibile</h2>
               {accessType !== 'pro' && (
-                  <div className="upgrade-message">
-                    {accessType === 'trial' ? (
-                        <p>Ești în perioada de probă! Fă upgrade la Pro pentru a debloca toate situațiile.</p>
-                    ) : (
-                        <p>Deblochează încă {Math.max(totalBotsCount - 3, 0)} situații făcând upgrade la versiunea Pro!</p>
-                    )}
-                  </div>
+                <div className="upgrade-message">
+                  {accessType === 'trial' ? (
+                    <p>Ești în perioada de probă! Fă upgrade la Pro pentru a debloca toate situațiile.</p>
+                  ) : (
+                    <p>Deblochează încă {Math.max(totalBotsCount - 3, 0)} situații făcând upgrade la versiunea Pro!</p>
+                  )}
+                </div>
               )}
             </div>
             <div className="bots-grid">
               {loading ? (
-                  <div className="loading">Încărcare situații...</div>
+                <div className="loading">Încărcare situații...</div>
               ) : error ? (
-                  <div className="error">Eroare încărcare situații: {error}</div>
+                <div className="error">Eroare încărcare situații: {error}</div>
               ) : (
-                  bots.map((bot) => {
-                    const difficulty = getDifficultyLabel(bot.difficulty);
-                    return (
-                        <div
-                            key={bot.id}
-                            className="bot-card"
-                            onClick={() => handleBotClick(bot.id)}
-                        >
-                          <div className="bot-card-image">
-                            <img
-                                src={getBotPicture(bot.gender)}
-                                alt={`${bot.gender} bot`}
-                            />
-                          </div>
-                          <div className="bot-card-content">
-                            <div className="bot-card-header">
-                              <h3>{bot.bot_name}</h3>
-                              <span
-                                  className="difficulty-badge"
-                                  style={{backgroundColor: difficulty.color}}
-                              >
+                bots.map((bot) => {
+                  const difficulty = getDifficultyLabel(bot.difficulty);
+                  return (
+                    <div
+                      key={bot.id}
+                      className="bot-card"
+                      onClick={() => handleBotClick(bot.id)}
+                    >
+                      <div className="bot-card-image">
+                        <img
+                          src={getBotPicture(bot.gender)}
+                          alt={`${bot.gender} bot`}
+                        />
+                      </div>
+                      <div className="bot-card-content">
+                        <div className="bot-card-header">
+                          <h3>{bot.bot_name}</h3>
+                          <span
+                            className="difficulty-badge"
+                            style={{ backgroundColor: difficulty.color }}
+                          >
                             {difficulty.label}
                           </span>
-                            </div>
-                            <div className="bot-card-category">
-                              {bot.categories?.title || 'Uncategorized'}
-                            </div>
-                          </div>
                         </div>
-                    );
-                  })
+                        <div className="bot-card-category">
+                          {bot.categories?.title || 'Uncategorized'}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
