@@ -271,6 +271,17 @@ const Dashboard = () => {
         return;
       }
 
+      const { count, error: countError } = await supabase
+        .from('subscriptions')
+        .select('id', { count: 'exact', head: true })
+        .eq('stripe_subscription_id', currentSub.stripe_subscription_id);
+
+      if (countError) throw countError;
+      if (count >= 10) {
+        alert("Ai atins limita de 10 membri în echipă.");
+        return;
+      }
+
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id')
