@@ -137,6 +137,10 @@ const Bots = () => {
     navigate('/subscriptions');
   };
 
+  const goToDashboard = () => {
+    navigate('/dashboard');
+  };
+
   return (
     <div className="dashboard-container">
       <button className="hamburger-button" onClick={toggleSidebar}>
@@ -182,6 +186,9 @@ const Bots = () => {
           />
           <h1>Situații</h1>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button onClick={goToDashboard} className="logout-button">
+              Înapoi la Dashboard
+            </button>
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>

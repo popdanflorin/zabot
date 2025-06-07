@@ -88,6 +88,10 @@ const Reports = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const goToDashboard = () => {
+    navigate('/dashboard');
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString('ro-RO', {
       year: 'numeric',
@@ -149,6 +153,9 @@ const Reports = () => {
           />
           <h1>Rapoarte</h1>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button onClick={goToDashboard} className="logout-button">
+              Înapoi la Dashboard
+            </button>
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
