@@ -4,6 +4,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
 import { Calendar } from 'lucide-react'
 import logo from "../assets/Verbo-nbg-dashboard.png";
+import andrei from '../assets/01.Andrei.png';
+import cristina from '../assets/02.Cristina.png';
+import radu from '../assets/03.Radu.png';
+import antonia from '../assets/04.Antonia.png';
+import alex from '../assets/05.Alex.png';
+import mihai from '../assets/06.Mihai.png';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -91,7 +97,18 @@ const Dashboard = () => {
 
     const fetchSuggestedBots = async (accessType) => {
       try {
-        let query = supabase.from('situations').select('*');
+        let query = supabase
+          .from('situations')
+          .select(`
+                    id,
+                    bot_name,
+                    difficulty,
+                    gender,
+                    categories (
+                      title
+                    )
+                  `)
+          .order('difficulty');
         if (['trial', 'free'].includes(accessType)) {
           query = query.in('id', [2, 3, 5]);
         }
@@ -110,6 +127,19 @@ const Dashboard = () => {
       fetchSuggestedBots(at);
     })();
   }, []);
+
+  const getDifficultyLabel = (difficulty) => {
+    switch (difficulty) {
+      case 0:
+        return { label: 'Easy', color: '#4ade80' }; // green
+      case 1:
+        return { label: 'Medium', color: '#fbbf24' }; // yellow
+      case 2:
+        return { label: 'Hard', color: '#f87171' }; // red
+      default:
+        return { label: 'Unknown', color: '#9ca3af' }; // gray
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -326,6 +356,18 @@ const Dashboard = () => {
     }
   };
 
+  const getBotPicture = (botId) => {
+    const botPictures = {
+      1: andrei,
+      2: cristina,
+      3: radu,
+      4: antonia,
+      5: alex,
+      6: mihai,
+    };
+    return botPictures[botId];
+  };
+
   return (
     <div className="dashboard-container">
       <button className="hamburger-button" onClick={toggleSidebar}>
@@ -455,11 +497,19 @@ const Dashboard = () => {
                   <h3>{bot.bot_name}</h3>
                   <span
                     className="difficulty-badge"
-                    style={{ backgroundColor: '#6c5ce7' }}
+                    style={{ backgroundColor: getDifficultyLabel(bot.difficulty).color }}
                   >
                     {getDifficultyText(bot.difficulty)}
                   </span>
-                  <span className="report-date">{bot.category}</span>
+                  <div className="bot-card-image">
+                    <img
+                      src={getBotPicture(bot.id)}
+                      alt={`${bot.gender} bot`}
+                    />
+                  </div>
+                  <div className="bot-card-category">
+                    {bot.categories?.title || 'Uncategorized'}
+                  </div>
                 </div>
               ))}
             </div>

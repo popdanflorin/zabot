@@ -586,14 +586,27 @@ body,
   transform: translateY(-2px);
 }
 
+.categories-container {
+  display: block;
+  width: 100%;
+}
+
+.bot-category-section {
+  margin-bottom: 2rem;
+}
+
+.category-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
 .bots-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  display: flex;
+  overflow-x: auto;
   gap: 20px;
   padding: 20px;
-  padding-bottom: 40px;
-  overflow-y: auto;
-  flex: 1;
+  scroll-snap-type: x mandatory;
 
   @media (max-width: 768px) {
     overflow-x: hidden;

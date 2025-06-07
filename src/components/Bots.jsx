@@ -4,6 +4,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
 import maleBotPicture from '../assets/male_bot_picture-Photoroom.png';
 import femaleBotPicture from '../assets/female_bot_picture-Photoroom.png';
+import andrei from '../assets/01.Andrei.png';
+import cristina from '../assets/02.Cristina.png';
+import radu from '../assets/03.Radu.png';
+import antonia from '../assets/04.Antonia.png';
+import alex from '../assets/05.Alex.png';
+import mihai from '../assets/06.Mihai.png';
 import logo from "../assets/Verbo-nbg-dashboard.png";
 
 const Bots = () => {
@@ -125,8 +131,16 @@ const Bots = () => {
     }
   };
 
-  const getBotPicture = (gender) => {
-    return gender === 'male' ? maleBotPicture : femaleBotPicture;
+  const getBotPicture = (botId) => {
+    const botPictures = {
+      1: andrei,
+      2: cristina,
+      3: radu,
+      4: antonia,
+      5: alex,
+      6: mihai,
+    };
+    return botPictures[botId];
   };
 
   const handleBotClick = (botId) => {
@@ -215,37 +229,51 @@ const Bots = () => {
               ) : error ? (
                 <div className="error">Eroare încărcare situații: {error}</div>
               ) : (
-                bots.map((bot) => {
-                  const difficulty = getDifficultyLabel(bot.difficulty);
-                  return (
-                    <div
-                      key={bot.id}
-                      className="bot-card"
-                      onClick={() => handleBotClick(bot.id)}
-                    >
-                      <div className="bot-card-image">
-                        <img
-                          src={getBotPicture(bot.gender)}
-                          alt={`${bot.gender} bot`}
-                        />
-                      </div>
-                      <div className="bot-card-content">
-                        <div className="bot-card-header">
-                          <h3>{bot.bot_name}</h3>
-                          <span
-                            className="difficulty-badge"
-                            style={{ backgroundColor: difficulty.color }}
-                          >
-                            {difficulty.label}
-                          </span>
-                        </div>
-                        <div className="bot-card-category">
-                          {bot.categories?.title || 'Uncategorized'}
-                        </div>
+                <div className="categories-container">
+                  {Object.entries(
+                    bots.reduce((acc, bot) => {
+                      const category = bot.categories?.title || 'Uncategorized';
+                      if (!acc[category]) acc[category] = [];
+                      acc[category].push(bot);
+                      return acc;
+                    }, {})
+                  ).map(([categoryName, botsInCategory]) => (
+                    <div key={categoryName} className="bot-category-section">
+                      <h2 className="category-title">{categoryName}</h2>
+                      <div className="bots-grid">
+                        {botsInCategory.map((bot) => {
+                          const difficulty = getDifficultyLabel(bot.difficulty);
+                          return (
+                            <div
+                              key={bot.id}
+                              className="bot-card"
+                              onClick={() => handleBotClick(bot.id)}
+                            >
+                              <div className="bot-card-image">
+                                <img
+                                  src={getBotPicture(bot.id)}
+                                  alt={`${bot.gender} bot`}
+                                  className="object-contain w-full h-full"
+                                />
+                              </div>
+                              <div className="bot-card-content">
+                                <div className="bot-card-header">
+                                  <h3>{bot.bot_name}</h3>
+                                  <span
+                                    className="difficulty-badge"
+                                    style={{ backgroundColor: difficulty.color }}
+                                  >
+                                    {difficulty.label}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
-                  );
-                })
+                  ))}
+                </div>
               )}
             </div>
           </div>
