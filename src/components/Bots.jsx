@@ -192,7 +192,7 @@ const Bots = () => {
           <div className="reports-section">
             <div className="section-header">
               <h2>Situații disponibile</h2>
-              {accessType !== 'pro' && (
+              {!['pro', 'team', 'team pro'].includes(accessType) && (
                 <div className="upgrade-message">
                   {accessType === 'trial' ? (
                     <p>Ești în perioada de probă! Fă upgrade la Pro pentru a debloca toate situațiile.</p>

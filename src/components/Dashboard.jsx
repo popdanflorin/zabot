@@ -378,6 +378,11 @@ const Dashboard = () => {
               <span className="plan-badge">
                 {`Plan: ${accessType.toUpperCase()}`}
               </span>
+              {(accessType === 'pro' || accessType === 'team') && (
+                <button onClick={cancelSubscription} className="cancel-link">
+                  Anulează abonamentul
+                </button>
+              )}
             </div>
             {(accessType === 'free' || accessType === 'trial') && (
               <button onClick={() => navigate('/subscriptions')} className="logout-button confirm">
@@ -389,22 +394,17 @@ const Dashboard = () => {
                 Leaderboard
               </button>
             )}
-            {(accessType === 'pro' || accessType === 'team') && (
-              <button onClick={cancelSubscription} className="logout-button cancel">
-                Anulează Abonamentul
-              </button>
-            )}
-            <button onClick={handleLogout} className="logout-button">
-              Logout
-            </button>
-            <button onClick={() => setFeedbackOpen(true)} className="logout-button">
-              Feedback
-            </button>
             {accessType === 'team' && (
               <button onClick={openTeamModal} className="logout-button">
                 Echipa mea
               </button>
             )}
+            <button onClick={() => setFeedbackOpen(true)} className="logout-button">
+              Feedback
+            </button>
+            <button onClick={handleLogout} className="logout-button">
+              Logout
+            </button>
           </div>
         </div>
 
