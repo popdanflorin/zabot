@@ -53,8 +53,20 @@ const Dashboard = () => {
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
-        if (subscription && subscription.status === 'active') {
-          nextAccessType = subscription.plan_name;
+        const { data: subscription_teampro } = await supabase
+          .from('subscriptions_teampro')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if ((subscription && subscription.status === 'active') ||
+          (subscription_teampro && subscription_teampro.status === 'active')
+        ) {
+          nextAccessType =
+            subscription?.status === 'active'
+              ? subscription.plan_name
+              : subscription_teampro?.plan_name;
         }
         else {
           const userCreatedAt = new Date(user.created_at);
@@ -302,12 +314,12 @@ const Dashboard = () => {
       }
 
       const { count, error: countError } = await supabase
-        .from('subscriptions')
+        .from('subscriptions_teampro')
         .select('id', { count: 'exact', head: true })
-        .eq('stripe_subscription_id', currentSub.stripe_subscription_id);
+        .eq('subscription_id', currentSub.stripe_subscription_id);
 
       if (countError) throw countError;
-      if (count >= 10) {
+      if (count >= 9) {
         alert("Ai atins limita de 10 membri în echipă.");
         return;
       }
@@ -326,10 +338,10 @@ const Dashboard = () => {
       const userId = userData.id;
 
       const { data: existing } = await supabase
-        .from('subscriptions')
+        .from('subscriptions_teampro')
         .select('*')
         .eq('user_id', userId)
-        .eq('stripe_subscription_id', currentSub.stripe_subscription_id);
+        .eq('subscription_id', currentSub.stripe_subscription_id);
 
       if (existing?.length) {
         alert("Utilizatorul este deja membru.");
@@ -337,10 +349,10 @@ const Dashboard = () => {
       }
 
       const { error: insertError } = await supabase
-        .from('subscriptions')
+        .from('subscriptions_teampro')
         .insert({
           user_id: userId,
-          stripe_subscription_id: currentSub.stripe_subscription_id,
+          subscription_id: currentSub.stripe_subscription_id,
           plan_name: 'team pro',
           status: 'active'
         });

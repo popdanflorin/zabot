@@ -29,8 +29,20 @@ const Reports = () => {
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
-        if (subscription && subscription.status === 'active') {
-          nextAccessType = subscription.plan_name;
+        const { data: subscription_teampro } = await supabase
+          .from('subscriptions_teampro')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if ((subscription && subscription.status === 'active') ||
+          (subscription_teampro && subscription_teampro.status === 'active')
+        ) {
+          nextAccessType =
+            subscription?.status === 'active'
+              ? subscription.plan_name
+              : subscription_teampro?.plan_name;
         }
         else {
           const userCreatedAt = new Date(user.created_at);
