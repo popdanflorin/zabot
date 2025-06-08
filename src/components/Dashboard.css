@@ -602,15 +602,10 @@ body,
 }
 
 .bots-grid {
-  display: flex;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 20px;
   padding: 20px;
-  scroll-snap-type: x mandatory;
-
-  @media (max-width: 768px) {
-    overflow-x: hidden;
-  }
 }
 
 .bots-grid::-webkit-scrollbar {
