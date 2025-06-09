@@ -414,17 +414,6 @@ const SituationChat = ({ situations }) => {
       </div>
       <div className="chat-content">
         <div className="chat-header">
-          <div className="header-left">
-            <div
-              className="timer"
-              style={{
-                '--progress': `${(timeLeft / (situationDetails.timer_in_minutes * 60)) * 100}%`
-              }}
-            >
-              <span>{formatTime(timeLeft)}</span>
-            </div>
-          </div>
-          <button className="end-now-button" onClick={() => setShowEndConfirm(true)}>Încheie conversația</button>
           <h3>
             {situation?.headline || 'Loading...'}{' '}
             <span
@@ -438,9 +427,9 @@ const SituationChat = ({ situations }) => {
               <span className="tooltip">Vezi obiectivele conversației</span>
             </span>
           </h3>
-
         </div>
         <div className="progress-bar-wrapper">
+          <button className="end-now-button" onClick={() => setShowEndConfirm(true)}>Încheie conversația</button>
           <div className={messageHintClass}>
             {messageHint}
           </div>
@@ -454,6 +443,16 @@ const SituationChat = ({ situations }) => {
             />
             <div className="progress-tooltip">
               Progres: {progress}%
+            </div>
+          </div>
+          <div className="header-left">
+            <div
+              className="timer"
+              style={{
+                '--progress': `${(timeLeft / (situationDetails.timer_in_minutes * 60)) * 100}%`
+              }}
+            >
+              <span>{formatTime(timeLeft)}</span>
             </div>
           </div>
         </div>
