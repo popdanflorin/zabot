@@ -35,7 +35,7 @@ serve(async (req)=>{
             content: msg.text
           }))
       ],
-      temperature: 0.2,
+      temperature: 0.7,
       max_tokens: 1000
     });
     return new Response(JSON.stringify({
