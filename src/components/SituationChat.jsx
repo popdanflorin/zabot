@@ -207,7 +207,7 @@ const SituationChat = ({ situations }) => {
   const handleEndNow = () => {
     const userMessagesCount = messages.filter(m => m.sender === 'user').length;
 
-    if (userMessagesCount < 2) {
+    if (userMessagesCount < 5) {
       setShowEndConfirm(false);
       setShowTooFewMessagesWarning(true);
       setShouldRedirect(false);
@@ -324,7 +324,7 @@ const SituationChat = ({ situations }) => {
     if (timeLeft === 0 && showReport && !reportGenerated) {
       const userMessagesCount = messages.filter(m => m.sender === 'user').length;
 
-      if (userMessagesCount < 2) {
+      if (userMessagesCount < 5) {
         setShowTooFewMessagesWarning(true);
         setShouldRedirect(true);
         return;
@@ -549,7 +549,7 @@ const SituationChat = ({ situations }) => {
       {showTooFewMessagesWarning && (
           <div className="confirm-overlay">
             <div className="confirm-dialog">
-              <p>Este nevoie de cel puțin 2 mesaje pentru a genera un raport.</p>
+              <p>Este nevoie de cel puțin 5 mesaje pentru a genera un raport.</p>
               <div className="confirm-buttons">
                 <button className="confirm-yes" onClick={handleTooFewMessagesOk}>OK</button>
               </div>
