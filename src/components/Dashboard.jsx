@@ -507,7 +507,7 @@ const Dashboard = () => {
             </button>
             {!hasReferred && (
               <button onClick={() => setReferralOpen(true)} className="logout-button">
-                Recomandat de
+                Community Access
               </button>
             )}
             <button onClick={handleLogout} className="logout-button">
@@ -641,7 +641,7 @@ const Dashboard = () => {
       {referralOpen && (
         <div className="referral-modal-overlay">
           <div className="referral-modal-content">
-            <h2>Cine ți-a recomandat aplicația?</h2>
+            <h2>Community Code</h2>
             <input
               type="text"
               value={referralName}
