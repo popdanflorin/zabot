@@ -30,6 +30,10 @@ const Dashboard = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [emailToAdd, setEmailToAdd] = useState("");
   const [trialHoursLeft, setTrialHoursLeft] = useState(null);
+  const [referralOpen, setReferralOpen] = useState(false);
+  const [referralName, setReferralName] = useState('');
+  const [hasReferred, setHasReferred] = useState(false);
+  const [referralSuccess, setReferralSuccess] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -142,6 +146,43 @@ const Dashboard = () => {
       fetchSuggestedBots(at);
     })();
   }, []);
+
+  useEffect(() => {
+    const checkReferral = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('user_referral')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (data) setHasReferred(true);
+      }
+    };
+    checkReferral();
+  }, []);
+
+  const handleSaveReferral = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!referralName.trim()) return;
+
+    const { error } = await supabase
+      .from('user_referral')
+      .insert([{ user_id: user.id, referral_name: referralName }]);
+
+    if (!error) {
+      setHasReferred(true);
+      setReferralSuccess(true);
+      setTimeout(() => {
+        setReferralOpen(false);
+        setReferralSuccess(false); // resetăm mesajul pentru data viitoare
+        setReferralName(''); // resetăm inputul
+      }, 2000);
+    } else {
+      alert("A apărut o eroare. Încearcă din nou.");
+    }
+  };
 
   const getDifficultyLabel = (difficulty) => {
     switch (difficulty) {
@@ -464,6 +505,11 @@ const Dashboard = () => {
             <button onClick={() => setFeedbackOpen(true)} className="logout-button">
               Feedback
             </button>
+            {!hasReferred && (
+              <button onClick={() => setReferralOpen(true)} className="logout-button">
+                Recomandat de
+              </button>
+            )}
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
@@ -588,6 +634,28 @@ const Dashboard = () => {
                 Adaugă membru
               </button>
               <button onClick={() => setTeamModalOpen(false)}>Închide</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {referralOpen && (
+        <div className="referral-modal-overlay">
+          <div className="referral-modal-content">
+            <h2>Cine ți-a recomandat aplicația?</h2>
+            <input
+              type="text"
+              value={referralName}
+              onChange={(e) => setReferralName(e.target.value)}
+              placeholder="Nume"
+            />
+            {referralSuccess && (
+              <div className="referral-success-message">
+                Mulțumim! Informația a fost salvată cu succes. 🎉
+              </div>
+            )}
+            <div className="referral-modal-actions">
+              <button onClick={handleSaveReferral}>Salvează</button>
+              <button onClick={() => setReferralOpen(false)}>Renunță</button>
             </div>
           </div>
         </div>

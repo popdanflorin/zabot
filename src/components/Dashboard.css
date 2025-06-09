@@ -962,6 +962,82 @@ body,
   background-color: #5a4bcf;
 }
 
+.referral-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.referral-modal-content {
+  background-color: #1e1e2f;
+  color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.3s ease-out;
+}
+
+.referral-modal-content h2 {
+  margin-bottom: 15px;
+}
+
+.referral-modal-content input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  background-color: #2a2a3d;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.referral-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.referral-modal-actions button {
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+  margin-left: 10px;
+}
+
+.referral-modal-actions button:hover {
+  background-color: #5a4bcf;
+}
+
+.referral-success-message {
+  background-color: #2ecc71;
+  color: #fff;
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.4s ease-out;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
