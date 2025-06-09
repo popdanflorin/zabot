@@ -29,6 +29,7 @@ const Dashboard = () => {
   const [teamModalOpen, setTeamModalOpen] = useState(false);
   const [teamMembers, setTeamMembers] = useState([]);
   const [emailToAdd, setEmailToAdd] = useState("");
+  const [trialHoursLeft, setTrialHoursLeft] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -74,6 +75,8 @@ const Dashboard = () => {
           const hoursSinceCreation = (now - userCreatedAt) / (1000 * 60 * 60);
           if (hoursSinceCreation <= 72) {
             nextAccessType = 'trial';
+            const trialHoursLeft = Math.floor(Math.max(0, 72 - hoursSinceCreation));
+            setTrialHoursLeft(trialHoursLeft);
           }
         }
       }
@@ -432,6 +435,11 @@ const Dashboard = () => {
               <span className="plan-badge">
                 {`Plan: ${accessType.toUpperCase()}`}
               </span>
+              {accessType === 'trial' && trialHoursLeft !== null && (
+                <span style={{ color: '#f87171', fontWeight: 'bold' }}>
+                  ⏳ {trialHoursLeft} {trialHoursLeft === 1 ? 'ora' : 'ore'} rămase din perioada de trial
+                </span>
+              )}
               {(accessType === 'pro' || accessType === 'team') && (
                 <button onClick={cancelSubscription} className="cancel-link">
                   Anulează abonamentul
