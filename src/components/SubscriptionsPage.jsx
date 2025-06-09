@@ -36,6 +36,7 @@ const startCheckout = async (plan) => {
 const featuresList = [
     { name: "3 situații easy (de încercare)", free: true, pro: true, team: true },
     { name: "Acces la toate situațiile", free: false, pro: true, team: true },
+    { name: "Acces lunar la situații noi", free: false, pro: true, team: true },
     { name: "Raport de performanță", free: false, pro: true, team: true },
     { name: "Descarcare raport PDF", free: false, pro: true, team: true },
     { name: "Până la 10 utilizatori", free: false, pro: false, team: true },
