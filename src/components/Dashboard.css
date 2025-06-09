@@ -1059,3 +1059,14 @@ body,
     opacity: 1;
   }
 }
+
+img.logo {
+  height: 300px;
+  margin-left: 20px;
+}
+
+@media (max-width: 768px) {
+  img.logo {
+    height: 200px;
+  }
+}

@@ -465,7 +465,7 @@ const Dashboard = () => {
           <img
             src={logo}
             alt="VERBO Logo"
-            style={{ height: '150px', marginLeft: '20px' }}
+            className="logo"
           />
           <h1>Dashboard</h1>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
