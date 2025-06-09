@@ -428,7 +428,7 @@ const Dashboard = () => {
           />
           <h1>Dashboard</h1>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", textAlign: "left" }}>
               <span className="user-name">
                 🙍‍♂️ {userName}
               </span>
