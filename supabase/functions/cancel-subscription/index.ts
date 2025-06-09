@@ -63,7 +63,7 @@ serve(async (req)=>{
     // Cancel the subscription in Stripe
     await stripe.subscriptions.cancel(subscription.stripe_subscription_id);
     // Delete the subscription record from the database
-    const { error: deleteTeamProError } = await supabase.from("subscriptions_teampro").delete().eq("user_id", user_id);
+    const { error: deleteTeamProError } = await supabase.from("subscriptions_teampro").delete().eq("subscription_id", subscription.stripe_subscription_id);
     const { error: deleteError } = await supabase.from("subscriptions").delete().eq("user_id", user_id);
     if (deleteError || deleteTeamProError) {
       console.error("Error deleting subscription record:", deleteError);
