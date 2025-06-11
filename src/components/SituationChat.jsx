@@ -588,7 +588,7 @@ const SituationChat = ({ situations }) => {
         <div className="objectives-modal-overlay" onClick={() => setShowObjectivesPopup(false)}>
           <div className="objectives-modal" onClick={(e) => e.stopPropagation()}>
             <h2>🎯 Obiective în această conversație</h2>
-            <p>{situationDetails?.objectives}</p>
+            <p>Obiectivul tău este să clarifici cât de bine poți subiectele interlocutorului, consolidând și relația voastră.</p>
             <button onClick={() => setShowObjectivesPopup(false)}>Închide</button>
           </div>
         </div>
