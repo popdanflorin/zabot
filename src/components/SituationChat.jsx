@@ -6,7 +6,6 @@ import { generateMonitoring } from '../lib/openai';
 import './SituationChat.css';
 import './Dashboard.css';
 import { pdf } from '@react-pdf/renderer'
-import ReportTable from './ReportToPdf.jsx';
 import ReportToPdf from "./ReportToPdf.jsx";
 
 const SituationChat = ({ situations }) => {
@@ -34,6 +33,20 @@ const SituationChat = ({ situations }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const situation = situations.find((s) => s.id === parseInt(id));
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error('Eroare la fetch user:', error.message);
+        return;
+      }
+      setUserName(user?.user_metadata?.full_name || user?.email || 'Anonim');
+    };
+
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     fetchSituationDetails();
@@ -346,7 +359,14 @@ const SituationChat = ({ situations }) => {
   };
 
   const handleDownloadPdf = async () => {
-    const blob = await pdf(<ReportToPdf data={userProgress} />).toBlob();
+    const blob = await pdf(
+    <ReportToPdf
+      data={userProgress}
+      userName={userName}
+      situationName={situationDetails?.bot_name}
+      dataGenerarii={new Date()}
+    />
+  ).toBlob();
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -499,6 +519,12 @@ const SituationChat = ({ situations }) => {
           <div className="report-overlay">
             <div className="report-content" id="report-content">
               <h2>Raport de Conversație</h2>
+              <p className="report-meta">
+                Situație: <strong>{situationDetails.bot_name || 'Situație necunoscută'}</strong> &nbsp;|&nbsp;
+                Data: <strong>{new Date().toLocaleDateString('ro-RO')}</strong> &nbsp;|&nbsp;
+                Ora: <strong>{new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}</strong><br />
+                Utilizator: <strong>{userName || 'Anonim'}</strong>
+              </p>
               <div className="report-details">
                 <div className="metrics-section">
                   <h3>Metrici de Comunicare</h3>

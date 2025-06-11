@@ -1,5 +1,5 @@
 import React from 'react';
-import {Page, Text, View, Document, StyleSheet, Font} from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
 import robotoBase64 from "../../public/fonts/RobotoRegularBase64.js";
 
 
@@ -39,10 +39,19 @@ const styles = StyleSheet.create({
 
 
 
-const ReportToPdf = ({ data }) => (
+const ReportToPdf = ({ data, userName, situationName, dataGenerarii }) => (
     <Document>
         <Page size="A4" style={styles.page}>
             <Text style={styles.title}>Raport de Conversație</Text>
+
+            <View style={styles.section}>
+                <Text>
+                    Situație: {situationName || 'Situație necunoscută'}{"\n"}
+                    Data: {dataGenerarii?.toLocaleDateString('ro-RO')}{"\n"}
+                    Ora: {dataGenerarii?.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}{"\n"}
+                    Utilizator: {userName || 'Anonim'}
+                </Text>
+            </View>
 
             <View style={styles.section}>
                 <Text style={styles.heading}>Metrici de Comunicare</Text>

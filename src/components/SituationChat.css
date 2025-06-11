@@ -853,6 +853,13 @@
   line-height: 1;
 }
 
+.report-meta {
+  font-size: 0.95rem;
+  color: #bbbbbb;
+  margin: 0.5rem 0 1.5rem;
+  text-align: center;
+}
+
 .continue-button {
   width: 100%;
   padding: 1rem;
