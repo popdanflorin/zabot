@@ -1,13 +1,13 @@
 import { serve } from "https://deno.land/std/http/server.ts";
 import Stripe from "https://esm.sh/stripe?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
-const stripe = new Stripe(Deno.env.get("STRIPE_API_KEY"), {
+const stripe = new Stripe(Deno.env.get("NEW_STRIPE_API_KEY"), {
   apiVersion: "2022-11-15"
 });
 const supabase = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
 const priceIds = {
-  pro: "price_1RJzuDLAjQv1iDu3IaqFd2wO",
-  team: "price_1RJzv6LAjQv1iDu3EEh4QOxz"
+  pro: "price_1RRpffRr5lNKMugr7BNEv1WQ",
+  team: "price_1RRphFRr5lNKMugryzmYuK5U"
 };
 serve(async (req)=>{
   if (req.method === "OPTIONS") {
