@@ -602,14 +602,16 @@ body,
 }
 
 .bots-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 20px;
   padding: 20px;
+  scroll-snap-type: x mandatory;
 }
 
 .bots-grid::-webkit-scrollbar {
-  width: 8px;
+  height: 8px;
 }
 
 .bots-grid::-webkit-scrollbar-track {
@@ -622,6 +624,14 @@ body,
   border-radius: 4px;
 }
 
+@media (max-width: 768px) {
+  .bots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    overflow-x: unset;
+  }
+}
+
 .bot-card {
   background-color: #333;
   border-radius: 12px;
@@ -632,6 +642,8 @@ body,
   flex-direction: column;
   border: 1px solid #444;
   cursor: pointer;
+  flex: 0 0 auto;
+  width: 240px;
 
   @media (max-width: 768px) {
     width: 80%;
