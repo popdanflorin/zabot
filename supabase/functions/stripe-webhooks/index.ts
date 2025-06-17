@@ -7,12 +7,12 @@ const stripe = new Stripe(Deno.env.get("NEW_STRIPE_API_KEY"), {
 const supabase = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
 serve(async (req)=>{
   const sig = req.headers.get("stripe-signature");
-  const body = await req.text();
+  const body = new Uint8Array(await req.arrayBuffer()); // ✅ FIXED
   let event;
   try {
     event = await stripe.webhooks.constructEventAsync(body, sig, Deno.env.get("NEW_STRIPE_WEBHOOK_SECRET"));
   } catch (err) {
-    console.error("Webhook signature verification failed.", err.message);
+    console.error("❌ Webhook signature verification failed.", err.message);
     return new Response(`Webhook Error: ${err.message}`, {
       status: 400
     });
