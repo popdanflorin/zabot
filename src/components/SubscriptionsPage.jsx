@@ -78,8 +78,8 @@ const SubscriptionsPage = () => {
                     <div className="badge badge-popular">Popular</div>
                     <h2>Pro</h2>
                     <div className="price">
-                        <div className="old-price">99 RON /lună</div>
-                        <div className="new-price">59 RON /lună</div>
+                        <div className="old-price">109 RON /lună</div>
+                        <div className="new-price">69 RON /lună</div>
                     </div>
                     <button className="subscribe-plan-button" onClick={() => startCheckout('pro')}>
                         Abonează-te
@@ -90,8 +90,8 @@ const SubscriptionsPage = () => {
                     <div className="badge badge-bestdeal">Best Deal</div>
                     <h2>Team</h2>
                     <div className="price">
-                        <div className="old-price">750 RON /lună</div>
-                        <div className="new-price">450 RON /lună</div>
+                        <div className="old-price">850 RON /lună</div>
+                        <div className="new-price">519 RON /lună</div>
                     </div>
                     <button className="subscribe-plan-button" onClick={() => startCheckout('team')}>
                         Abonează-te
