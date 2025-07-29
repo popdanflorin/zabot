@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import './Dashboard.css';
 import { Calendar } from 'lucide-react'
 import logo from "../assets/Verbo-nbg-dashboard.png";
@@ -513,6 +513,9 @@ const Dashboard = () => {
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
+            <Link to="/privacy-policy" className="cancel-link" target="_blank" rel="noopener noreferrer">
+              Privacy Policy
+            </Link>
           </div>
         </div>
 

@@ -1,0 +1,31 @@
+.privacy-container {
+  padding: 20px;
+  color: white;
+  text-align: center;
+  background-color: #242424;
+  min-height: 100vh;
+  max-width: 900px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.privacy-container h1,
+.privacy-container h2,
+.privacy-container h3,
+.privacy-container h4 {
+  text-align: left;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.privacy-container p,
+.privacy-container li {
+  text-align: left;
+  margin-bottom: 1em;
+}
+
+.privacy-container ul {
+  padding-left: 20px;
+  text-align: left;
+}

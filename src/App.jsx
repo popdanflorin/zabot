@@ -12,6 +12,7 @@ import Reports from './components/Reports';
 import SubscriptionsPage from "./components/SubscriptionsPage.jsx";
 import Leaderboard from "./components/Leaderboard.jsx";
 import AutoRedirectIfAuthenticated from './components/AutoRedirectIfAuthenticated';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 // Move ProtectedRoute inside a separate component that has access to router hooks
 const ProtectedRouteWrapper = ({ children }) => {
@@ -139,6 +140,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         
         {/* Protected routes */}
         <Route
