@@ -1,125 +1,129 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./SubscriptionsPage.css";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabaseClient";
+import "./SubscriptionsPage.css";
 
-const startCheckout = async (plan) => {
-    const { data: { session } } = await supabase.auth.getSession();
+const startCheckout = async (plan, t) => {
+  const { data: { session } } = await supabase.auth.getSession();
 
-    if (!session) {
-        alert("Trebuie să fii logat pentru a face o plată.");
-        return;
-    }
+  if (!session) {
+    alert(t("subscriptions.alerts.loginRequired"));
+    return;
+  }
 
-    const res = await fetch("https://yaltlxdrppiqlardcxwz.supabase.co/functions/v1/create-checkout-session", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({
-            user_id: session.user.id,
-            plan
-        })
-    });
+  const res = await fetch("https://yaltlxdrppiqlardcxwz.supabase.co/functions/v1/create-checkout-session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${session.access_token}`
+    },
+    body: JSON.stringify({
+      user_id: session.user.id,
+      plan
+    })
+  });
 
-    const data = await res.json();
+  const data = await res.json();
 
-    if (data?.url) {
-        window.location.href = data.url;
-    } else {
-        alert("Eroare la inițierea plății.");
-        console.error(data);
-    }
+  if (data?.url) {
+    window.location.href = data.url;
+  } else {
+    alert(t("subscriptions.alerts.paymentError"));
+    console.error(data);
+  }
 };
 
 const featuresList = [
-    { name: "3 situații easy (de încercare)", free: true, pro: true, team: true },
-    { name: "Acces la toate situațiile", free: false, pro: true, team: true },
-    { name: "Acces lunar la situații noi", free: false, pro: true, team: true },
-    { name: "Raport de performanță", free: false, pro: true, team: true },
-    { name: "Descarcare raport PDF", free: false, pro: true, team: true },
-    { name: "Până la 10 utilizatori", free: false, pro: false, team: true },
+  { key: "easySituations", free: true, pro: true, team: true },
+  { key: "allSituations", free: false, pro: true, team: true },
+  { key: "monthlySituations", free: false, pro: true, team: true },
+  { key: "performanceReport", free: false, pro: true, team: true },
+  { key: "downloadPdf", free: false, pro: true, team: true },
+  { key: "teamUsers", free: false, pro: false, team: true }
 ];
 
 const SubscriptionsPage = () => {
-    const navigate = useNavigate();
-    const [fadeIn, setFadeIn] = useState(false);
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [fadeIn, setFadeIn] = useState(false);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setFadeIn(true);
-        }, 100);
-        return () => clearTimeout(timer);
-    }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFadeIn(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
-    const goToDashboard = () => {
-        navigate('/dashboard');
-    };
+  const goToDashboard = () => {
+    navigate('/dashboard');
+  };
 
-    return (
-        <div className={`subscriptions-page ${fadeIn ? "fade-in" : ""}`}>
-            <div className="top-bar">
-                <button onClick={goToDashboard} className="back-button">
-                    Înapoi la Dashboard
-                </button>
-            </div>
+  return (
+    <div className={`subscriptions-page ${fadeIn ? "fade-in" : ""}`}>
+      <div className="top-bar">
+        <button onClick={goToDashboard} className="back-button">
+          {t("subscriptions.backToDashboard")}
+        </button>
+      </div>
 
-            <h1 className="page-title">Alege planul perfect pentru tine</h1>
+      <h1 className="page-title">{t("subscriptions.pageTitle")}</h1>
 
-            <div className="pricing-buttons">
-                <div className="plan-option">
-                    <h2>Free</h2>
-                    <p className="price">0 RON</p>
-                    <button className="subscribe-plan-button free" disabled>Activ Automat</button>
-                </div>
-
-                <div className="plan-option popular">
-                    <div className="badge badge-popular">Popular</div>
-                    <h2>Pro</h2>
-                    <div className="price">
-                        <div className="old-price">109 RON /lună</div>
-                        <div className="new-price">69 RON /lună</div>
-                    </div>
-                    <button className="subscribe-plan-button" onClick={() => startCheckout('pro')}>
-                        Abonează-te
-                    </button>
-                </div>
-
-                <div className="plan-option best-deal">
-                    <div className="badge badge-bestdeal">Best Deal</div>
-                    <h2>Team</h2>
-                    <div className="price">
-                        <div className="old-price">850 RON /lună</div>
-                        <div className="new-price">519 RON /lună</div>
-                    </div>
-                    <button className="subscribe-plan-button" onClick={() => startCheckout('team')}>
-                        Abonează-te
-                    </button>
-                </div>
-            </div>
-
-            <h2 className="comparison-title">Ce oferă fiecare plan</h2>
-
-            <div className="comparison-table">
-                <div className="table-header">
-                    <div className="feature-title"></div>
-                    <div className="plan-title">Free</div>
-                    <div className="plan-title">Pro</div>
-                    <div className="plan-title">Team</div>
-                </div>
-
-                {featuresList.map((feature, idx) => (
-                    <div key={idx} className="table-row">
-                        <div className="feature-title">{feature.name}</div>
-                        <div className="plan-cell">{feature.free ? "✔️" : "❌"}</div>
-                        <div className="plan-cell">{feature.pro ? "✔️" : "❌"}</div>
-                        <div className="plan-cell">{feature.team ? "✔️" : "❌"}</div>
-                    </div>
-                ))}
-            </div>
+      <div className="pricing-buttons">
+        <div className="plan-option">
+          <h2>{t("subscriptions.freePlan")}</h2>
+          <p className="price">0 RON</p>
+          <button className="subscribe-plan-button free" disabled>
+            {t("subscriptions.activateAutomatically")}
+          </button>
         </div>
-    );
+
+        <div className="plan-option popular">
+          <div className="badge badge-popular">{t("subscriptions.popular")}</div>
+          <h2>{t("subscriptions.proPlan")}</h2>
+          <div className="price">
+            <div className="old-price">{t("subscriptions.oldPrice", { price: 109 })}</div>
+            <div className="new-price">{t("subscriptions.newPrice", { price: 69 })}</div>
+          </div>
+          <button className="subscribe-plan-button" onClick={() => startCheckout('pro', t)}>
+            {t("subscriptions.subscribe")}
+          </button>
+        </div>
+
+        <div className="plan-option best-deal">
+          <div className="badge badge-bestdeal">{t("subscriptions.bestDeal")}</div>
+          <h2>{t("subscriptions.teamPlan")}</h2>
+          <div className="price">
+            <div className="old-price">{t("subscriptions.oldPrice", { price: 850 })}</div>
+            <div className="new-price">{t("subscriptions.newPrice", { price: 519 })}</div>
+          </div>
+          <button className="subscribe-plan-button" onClick={() => startCheckout('team', t)}>
+            {t("subscriptions.subscribe")}
+          </button>
+        </div>
+      </div>
+
+      <h2 className="comparison-title">{t("subscriptions.comparisonTitle")}</h2>
+
+      <div className="comparison-table">
+        <div className="table-header">
+          <div className="feature-title"></div>
+          <div className="plan-title">{t("subscriptions.freePlan")}</div>
+          <div className="plan-title">{t("subscriptions.proPlan")}</div>
+          <div className="plan-title">{t("subscriptions.teamPlan")}</div>
+        </div>
+
+        {featuresList.map((feature, idx) => (
+          <div key={idx} className="table-row">
+            <div className="feature-title">{t(`subscriptions.features.${feature.key}`)}</div>
+            <div className="plan-cell">{feature.free ? "✔️" : "❌"}</div>
+            <div className="plan-cell">{feature.pro ? "✔️" : "❌"}</div>
+            <div className="plan-cell">{feature.team ? "✔️" : "❌"}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default SubscriptionsPage;

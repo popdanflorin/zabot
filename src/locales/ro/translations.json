@@ -1,0 +1,185 @@
+{
+    "nav": {
+        "dashboard": "Tablou de bord",
+        "situations": "Situații",
+        "reports": "Rapoarte"
+    },
+    "dashboard": "Tablou de bord",
+    "situations": "Situații",
+    "reports_name": "Rapoarte",
+    "plan": "Plan",
+    "hour": "ora",
+    "hours": "ore",
+    "remaining_trial_hours": "rămase din perioada de probă",
+    "subscribe": "Abonează-te",
+    "cancel": "Anulează abonamentul",
+    "leaderboard_name": "Clasament",
+    "my_team": "Echipa mea",
+    "feedback": "Impresii",
+    "community_access": "Acces comunitate",
+    "logout": "Deconectare",
+    "privacy_policy": "Politică de confidențialitate",
+    "latest_reports": "Cele mai recente rapoarte",
+    "view_all_reports": "Vezi toate rapoartele",
+    "loading_reports": "Se încarcă rapoartele...",
+    "error_reports": "Eroare la încărcarea rapoartelor:",
+    "no_reports": "Nu este niciun raport disponibil momentan. Completează situații ca să vezi progresul tău!",
+    "suggested_situations": "Situații sugerate",
+    "view_all_situations": "Vezi toate situațiile",
+    "success": "% Succes",
+    "leave_feedback": "Lasă-ne o impresie",
+    "feedback_placeholder": "Scrie părerea ta despre aplicație sau sugestii de îmbunătățire...",
+    "feedback_thankyou": "Mulțumim pentru impresie!",
+    "feedback_sending": "Se trimite...",
+    "feedback_send": "Trimite",
+    "close": "Închide",
+    "teamModal.title": "Membrii echipei",
+    "teamModal.empty": "Nu ai membri în echipă încă.",
+    "teamModal.inputPlaceholder": "Email nou membru",
+    "teamModal.addButton": "Adaugă membru",
+    "teamModal.closeButton": "Închide",
+    "referralModal.title": "Codul de comunitate",
+    "referralModal.inputPlaceholder": "Nume",
+    "referralModal.success": "Mulțumim! Informația a fost salvată cu succes.",
+    "referralModal.saveButton": "Salvează",
+    "referralModal.cancelButton": "Renunță",
+    "back_dashboard": "Înapoi la Tabloul de Bord",
+    "bots": {
+        "availableSituations": "Situații disponibile",
+        "trialMessage": "Ești în perioada de probă! Fă upgrade la Pro pentru a debloca toate situațiile.",
+        "upgradeMessage": "Deblochează încă {{count}} situații făcând upgrade la versiunea Pro!",
+        "loading": "Încărcare situații...",
+        "error": "Eroare încărcare situații: {{error}}",
+        "uncategorized": "Necategorizat"
+    },
+    "reports": {
+        "yourReports": "Rapoartele tale",
+        "loading": "Se încarcă rapoartele...",
+        "error": "Eroare la încărcarea rapoartelor: {{error}}",
+        "noReports": "Nu este niciun raport disponibil momentan. Completează situații ca să vezi progresul tău!",
+        "unknownBot": "Bot necunoscut",
+        "success": "Succes",
+        "communicationMetrics": "Metrici de comunicare:",
+        "assertive": "Asertiv",
+        "aggressive": "Agresiv",
+        "passive": "Pasiv",
+        "goodPoints": "Puncte Forte:",
+        "recommendations": "Recomandări:"
+    },
+    "subscriptions": {
+        "backToDashboard": "Înapoi la Dashboard",
+        "pageTitle": "Alege planul perfect pentru tine",
+        "freePlan": "Gratis",
+        "proPlan": "Profesional",
+        "teamPlan": "Echipă",
+        "pricePerMonth": "{{price}} RON /lună",
+        "oldPrice": "{{price}} RON /lună",
+        "newPrice": "{{price}} RON /lună",
+        "activateAutomatically": "Activ Automat",
+        "subscribe": "Abonează-te",
+        "popular": "Popular",
+        "bestDeal": "Best Deal",
+        "comparisonTitle": "Ce oferă fiecare plan",
+        "features": {
+            "easySituations": "3 situații easy (de încercare)",
+            "allSituations": "Acces la toate situațiile",
+            "monthlySituations": "Acces lunar la situații noi",
+            "performanceReport": "Raport de performanță",
+            "downloadPdf": "Descarcare raport PDF",
+            "teamUsers": "Până la 10 utilizatori"
+        },
+        "alerts": {
+            "loginRequired": "Trebuie să fii logat pentru a face o plată.",
+            "paymentError": "Eroare la inițierea plății."
+        }
+    },
+    "leaderboard": {
+        "title": "Clasament",
+        "loading": "Se încarcă...",
+        "email": "Email",
+        "score": "Scor",
+        "unknown": "Necunoscut",
+        "empty": "Nu sunt date disponibile."
+    },
+    "pdf": {
+        "title": "Raport de Conversație",
+        "situation": "Situație",
+        "unknown_situation": "Situație necunoscută",
+        "date": "Data",
+        "time": "Ora",
+        "user": "Utilizator",
+        "anonymous": "Anonim",
+        "communication_metrics": "Metrici de Comunicare",
+        "overall_success": "Succes General",
+        "assertive": "Stil Asertiv",
+        "aggressive": "Stil Agresiv",
+        "passive": "Stil Pasiv",
+        "dialogue_strengths": "Puncte Forte în Dialog",
+        "recommendations": "Recomandări"
+    },
+    "chat": {
+        "last_message_warning": "Ultimul mesaj disponibil!",
+        "limit_reached": "Limită de mesaje atinsă",
+        "messages_remaining": "{{remaining}} mesaje rămase din {{total}}"
+    },
+    "sidebar": {
+        "dashboard": "Tablou de bord",
+        "bots": "Situații",
+        "reports": "Rapoarte"
+    },
+    "header": {
+        "loading": "Se încarcă...",
+        "infoTooltip": "Vezi obiectivele conversației"
+    },
+    "buttons": {
+        "endNow": "Încheie conversația",
+        "send": "Trimite",
+        "downloadPdf": "Descarcă PDF",
+        "close": "Închide",
+        "ok": "OK",
+        "cancel": "Renunță",
+        "dismiss": "Închide"
+    },
+    "messages": {
+        "placeholder": "Scrie mesajul tau...",
+        "typing": "{{botName}} scrie..."
+    },
+    "progress": {
+        "label": "Progres: {{progress}}%"
+    },
+    "messageHint": {
+        "last": "⚠️ Ultimul mesaj disponibil!",
+        "limit": "❌ Limită de mesaje atinsă",
+        "remaining": "💬 {{remaining}} mesaje rămase din {{total}}"
+    },
+    "report": {
+        "title": "Raport de Conversație",
+        "situation": "Situație",
+        "date": "Data",
+        "time": "Ora",
+        "user": "Utilizator",
+        "metrics": {
+            "title": "Metrici de Comunicare",
+            "overall": "Succces General: {{value}}%",
+            "assertive": "Stil Asertiv: {{value}}%",
+            "aggressive": "Stil Agresiv: {{value}}%",
+            "passive": "Stil Pasiv: {{value}}%"
+        },
+        "strengths": {
+            "title": "Puncte Forte în Dialog"
+        },
+        "recommendations": {
+            "title": "Recomandări pentru Îmbunătățire"
+        }
+    },
+    "confirmEnd": {
+        "title": "Ești sigur că vrei să închei conversația acum?"
+    },
+    "tooFewMessages": {
+        "title": "Este nevoie de cel puțin 5 mesaje pentru a genera un raport."
+    },
+    "objectives": {
+        "title": "🎯 Obiective în această conversație",
+        "text": "Obiectivul tău este să clarifici cât de bine poți subiectele interlocutorului, consolidând și relația voastră."
+    }
+}

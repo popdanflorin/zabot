@@ -1,0 +1,185 @@
+{
+    "nav": {
+        "dashboard": "Dashboards",
+        "situations": "Situations",
+        "reports": "Reports"
+    },
+    "dashboard": "Dashboard",
+    "situations": "Situations",
+    "reports_name": "Reports",
+    "plan": "Plan",
+    "hour": "hour",
+    "hours": "hours",
+    "remaining_trial_hours": "left in trial",
+    "subscribe": "Subscribe",
+    "cancel": "Cancel Subscription",
+    "leaderboard_name": "Leaderboard",
+    "my_team": "My Team",
+    "feedback": "Feedback",
+    "community_access": "Community Access",
+    "logout": "Logout",
+    "privacy_policy": "Privacy Policy",
+    "latest_reports": "Latest Reports",
+    "view_all_reports": "View all reports",
+    "loading_reports": "Loading reports...",
+    "error_reports": "Loading reports error:",
+    "no_reports": "No reports available yet. Complete some situations to see your progress!",
+    "suggested_situations": "Suggested Situations",
+    "view_all_situations": "View all situations",
+    "success": "% Success",
+    "leave_feedback": "Leave us a feedback",
+    "feedback_placeholder": "Write your opinion about the app or suggest an improvement...",
+    "feedback_thankyou": "Thank you for your feedback!",
+    "feedback_sending": "Sending...",
+    "feedback_send": "Send",
+    "close": "Close",
+    "teamModal.title": "Team members",
+    "teamModal.empty": "No members in your team yet.",
+    "teamModal.inputPlaceholder": "New member email",
+    "teamModal.addButton": "Add member",
+    "teamModal.closeButton": "Close",
+    "referralModal.title": "Community Code",
+    "referralModal.inputPlaceholder": "Name",
+    "referralModal.success": "Thank you! Info was successfully saved.",
+    "referralModal.saveButton": "Save",
+    "referralModal.cancelButton": "Cancel",
+    "back_dashboard": "Back to Dashboard",
+    "bots": {
+        "availableSituations": "Available Situations",
+        "trialMessage": "You're on a trial! Upgrade to Pro to unlock all situations.",
+        "upgradeMessage": "Unlock {{count}} more situations by upgrading to the Pro version!",
+        "loading": "Loading situations...",
+        "error": "Error loading situations: {{error}}",
+        "uncategorized": "Uncategorized"
+    },
+    "reports": {
+        "yourReports": "Your reports",
+        "loading": "Loading reports...",
+        "error": "Loading reports error: {{error}}",
+        "noReports": "No available reports. Unlock situations to see your progress!",
+        "unknownBot": "Unkown Siuation",
+        "success": "Success",
+        "communicationMetrics": "Communication metrics:",
+        "assertive": "Assertive ",
+        "aggressive": "Agressive",
+        "passive": "Passive",
+        "goodPoints": "Strong Points:",
+        "recommendations": "Recommendations:"
+    },
+    "subscriptions": {
+        "backToDashboard": "Back to Dashboard",
+        "pageTitle": "Choose your perfect plan",
+        "freePlan": "Free",
+        "proPlan": "Pro",
+        "teamPlan": "Team",
+        "pricePerMonth": "{{price}} RON /month",
+        "oldPrice": "{{price}} RON /month",
+        "newPrice": "{{price}} RON /month",
+        "activateAutomatically": "Activ Automat",
+        "subscribe": "Subscribe",
+        "popular": "Popular",
+        "bestDeal": "Best Deal",
+        "comparisonTitle": "What each plan offers",
+        "features": {
+            "easySituations": "3 easy situations (trial)",
+            "allSituations": "Access to all situations",
+            "monthlySituations": "Monthly access to new situations",
+            "performanceReport": "Performance report",
+            "downloadPdf": "PDF report download",
+            "teamUsers": "Up to 10 users"
+        },
+        "alerts": {
+            "loginRequired": "You have to be logged in to make a payment.",
+            "paymentError": "Error iniating the payment."
+        }
+    },
+    "leaderboard": {
+        "title": "Leaderboard",
+        "loading": "Loading...",
+        "email": "Email",
+        "score": "Score",
+        "unknown": "Unknown",
+        "empty": "No data available."
+    },
+    "pdf": {
+        "title": "Conversation report",
+        "situation": "Situation",
+        "unknown_situation": "Unknown situation",
+        "date": "Date",
+        "time": "Hour",
+        "user": "User",
+        "anonymous": "Anonymous",
+        "communication_metrics": "Communication Metrics",
+        "overall_success": "General Success",
+        "assertive": "Assertive Style",
+        "aggressive": "Agressive Style",
+        "passive": "Passive Style",
+        "dialogue_strengths": "Dialogue Strong Points",
+        "recommendations": "Recommendations"
+    },
+    "chat": {
+        "last_message_warning": "Last message available!",
+        "limit_reached": "Message limit reached",
+        "messages_remaining": "{{remaining}} messages left out of {{total}}"
+    },
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "bots": "Bots",
+        "reports": "Reports"
+    },
+    "header": {
+        "loading": "Loading...",
+        "infoTooltip": "Click to view objectives"
+    },
+    "buttons": {
+        "endNow": "End Now",
+        "send": "Send",
+        "downloadPdf": "Download PDF",
+        "close": "Continue",
+        "ok": "OK",
+        "cancel": "Cancel",
+        "dismiss": "Dismiss"
+    },
+    "progress": {
+        "label": "{{progress}}% complete"
+    },
+    "messages": {
+        "placeholder": "Type your message...",
+        "typing": "{{botName}} is typing..."
+    },
+    "messageHint": {
+        "last": "⚠️ Last message available!",
+        "limit": "❌ Message limit reached",
+        "remaining": "💬 {{remaining}} messages left of {{total}}"
+    },
+    "report": {
+        "title": "Conversation Report",
+        "situation": "Situation",
+        "date": "Date",
+        "time": "Time",
+        "user": "User",
+        "metrics": {
+            "title": "Communication Metrics",
+            "overall": "Overall Success: {{value}}%",
+            "assertive": "Assertive Style: {{value}}%",
+            "aggressive": "Aggressive Style: {{value}}%",
+            "passive": "Passive Style: {{value}}%"
+        },
+        "strengths": {
+            "title": "Good Points in Dialogue"
+        },
+        "recommendations": {
+            "title": "Recommendations"
+        }
+    },
+    "confirmEnd": {
+        "title": "Are you sure you want to end the situation?"
+    },
+    "tooFewMessages": {
+        "title": "You need to send at least 2 messages before ending the situation."
+    },
+    "objectives": {
+        "title": "🎯 Situation Objectives",
+        "text": "Your goal is to clarify the interlocutor's topics as best you can, while also strengthening your relationship."
+    }
+}

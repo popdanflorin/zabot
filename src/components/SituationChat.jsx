@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { generateChatResponse } from '../lib/openai';
@@ -7,6 +7,7 @@ import './SituationChat.css';
 import './Dashboard.css';
 import { pdf } from '@react-pdf/renderer'
 import ReportToPdf from "./ReportToPdf.jsx";
+import { useTranslation } from 'react-i18next';
 
 const SituationChat = ({ situations }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -34,6 +35,10 @@ const SituationChat = ({ situations }) => {
   const location = useLocation();
   const situation = situations.find((s) => s.id === parseInt(id));
   const [userName, setUserName] = useState('');
+  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
+  const suffix = lang === 'ro' ? '' : '_en';
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -109,7 +114,13 @@ const SituationChat = ({ situations }) => {
       // Start the conversation with a generated message from OpenAI
       setIsTyping(true);
       try {
-        const situationContext = data.prompt + data.objectives + data.initial_phrase + data.bot_behaviours.prompt;
+        const lang = i18n.language;
+        const suffix = lang === 'ro' ? '' : '_en';
+        const situationContext =
+          data[`prompt${suffix}`] +
+          data[`objectives${suffix}`] +
+          data[`initial_phrase${suffix}`] +
+          data.bot_behaviours[`prompt${suffix}`];
 
         const botResponse = await generateChatResponse(
           [], // Empty messages array since this is the first message
@@ -185,7 +196,13 @@ const SituationChat = ({ situations }) => {
 
     // Get bot response using OpenAI
     try {
-      const situationContext = situationDetails.prompt + situationDetails.objectives + situationDetails.initial_phrase + situationDetails.bot_behaviours.prompt;
+      const lang = i18n.language;
+      const suffix = lang === 'ro' ? '' : '_en';
+      const situationContext =
+        situationDetails[`prompt${suffix}`] +
+        situationDetails[`objectives${suffix}`] +
+        situationDetails[`initial_phrase${suffix}`] +
+        situationDetails.bot_behaviours[`prompt${suffix}`];
 
       const botResponse = await generateChatResponse(
         [...messages, userMessage],
@@ -240,7 +257,9 @@ const SituationChat = ({ situations }) => {
   const analyzeCommunicationStyle = async (messages) => {
     try {
 
-      const conversationContext = evaluationTypes[0].prompt; //TODO use the prompt on the user's subscription
+      const lang = i18n.language;
+      const suffix = lang === 'ro' ? '' : '_en';
+      const conversationContext = evaluationTypes[0][`prompt${suffix}`];
 
       const userMessages = messages.filter(msg => msg.sender === 'user');
       const analysis = await generateMonitoring(userMessages, conversationContext);
@@ -360,13 +379,13 @@ const SituationChat = ({ situations }) => {
 
   const handleDownloadPdf = async () => {
     const blob = await pdf(
-    <ReportToPdf
-      data={userProgress}
-      userName={userName}
-      situationName={situationDetails?.bot_name}
-      dataGenerarii={new Date()}
-    />
-  ).toBlob();
+      <ReportToPdf
+        data={userProgress}
+        userName={userName}
+        situationName={situationDetails?.bot_name}
+        dataGenerarii={new Date()}
+      />
+    ).toBlob();
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -387,10 +406,13 @@ const SituationChat = ({ situations }) => {
   const remaining = situationDetails.max_messages - messages.filter(m => m.sender === 'user').length;
 
   const messageHint = remaining === 1
-    ? '⚠️ Ultimul mesaj disponibil!'
+    ? t('chat.last_message_warning')
     : remaining <= 0
-      ? '❌   Limită de mesaje atinsă'
-      : `💬   ${remaining} mesaje rămase din ${situationDetails.max_messages}`;
+      ? t('chat.limit_reached')
+      : t('chat.messages_remaining', {
+        remaining,
+        total: situationDetails.max_messages
+      });
 
   const messageHintClass = remaining <= 0
     ? 'message-limit-indicator message-limit-danger'
@@ -400,42 +422,34 @@ const SituationChat = ({ situations }) => {
 
   return (
     <div className="chat-container">
+      {/* Sidebar */}
       <button className="hamburger-button" onClick={toggleSidebar}>
         <div className="hamburger-icon">
-          <span></span>
-          <span></span>
-          <span></span>
+          <span></span><span></span><span></span>
         </div>
       </button>
 
       <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-content">
           <div className="nav-buttons">
-            <button
-              className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`}
-              onClick={() => navigate('/dashboard')}
-            >
-              Dashboard
+            <button className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={() => navigate('/dashboard')}>
+              {t('sidebar.dashboard')}
             </button>
-            <button
-              className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
-              onClick={() => navigate('/bots')}
-            >
-              Bots
+            <button className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`} onClick={() => navigate('/bots')}>
+              {t('sidebar.bots')}
             </button>
-            <button
-              className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
-              onClick={() => navigate('/reports')}
-            >
-              Reports
+            <button className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`} onClick={() => navigate('/reports')}>
+              {t('sidebar.reports')}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Chat Content */}
       <div className="chat-content">
         <div className="chat-header">
           <h3>
-            {situation?.headline || 'Loading...'}{' '}
+            {situation ? situation[`headline${suffix}`] : t('header.loading')}{' '}
             <span
               className={`info-icon ${!hasClickedInfo ? 'pulse-loop' : ''}`}
               onClick={() => {
@@ -444,157 +458,134 @@ const SituationChat = ({ situations }) => {
               }}
             >
               ℹ️
-              <span className="tooltip">Vezi obiectivele conversației</span>
+              <span className="tooltip">{t('header.infoTooltip')}</span>
             </span>
           </h3>
         </div>
+
         <div className="progress-bar-wrapper">
-          <button className="end-now-button" onClick={() => setShowEndConfirm(true)}>Încheie conversația</button>
-          <div className={messageHintClass}>
-            {messageHint}
-          </div>
+          <button className="end-now-button" onClick={() => setShowEndConfirm(true)}>
+            {t('buttons.endNow')}
+          </button>
+          <div className={messageHintClass}>{messageHint}</div>
           <div className="progress-bar">
-            <div
-              className="progress-fill"
-              style={{
-                width: `${progress}%`,
-                backgroundColor: getProgressColor(progress),
-              }}
-            />
-            <div className="progress-tooltip">
-              Progres: {progress}%
-            </div>
+            <div className="progress-fill" style={{ width: `${progress}%`, backgroundColor: getProgressColor(progress) }} />
+            <div className="progress-tooltip">{t('progress.label', { progress })}</div>
           </div>
           <div className="header-left">
-            <div
-              className="timer"
-              style={{
-                '--progress': `${(timeLeft / (situationDetails.timer_in_minutes * 60)) * 100}%`
-              }}
-            >
+            <div className="timer" style={{ '--progress': `${(timeLeft / (situationDetails.timer_in_minutes * 60)) * 100}%` }}>
               <span>{formatTime(timeLeft)}</span>
             </div>
           </div>
         </div>
 
+        {/* Messages */}
         <div className="chat-area">
           {messages.map((msg) => (
             <div key={msg.id} className={`message ${msg.sender}`}>
-              <div className="message-content">
-                {msg.text}
-              </div>
-              <div className="message-timestamp">
-                {new Date(msg.timestamp).toLocaleTimeString()}
-              </div>
+              <div className="message-content">{msg.text}</div>
+              <div className="message-timestamp">{new Date(msg.timestamp).toLocaleTimeString()}</div>
             </div>
           ))}
           {isTyping && (
-            <div className="typing-indicator">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
+            <div className="typing-indicator"><span></span><span></span><span></span></div>
           )}
           <div ref={chatEndRef} />
         </div>
+
+        {/* Input */}
         <form className="input-area" onSubmit={handleSendMessage}>
           <input
             type="text"
             ref={inputRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Scrie mesajul tau..."
+            placeholder={t('messages.placeholder')}
             disabled={isTyping}
           />
           <button type="submit" disabled={isTyping || !message.trim()}>
-            {isTyping ? situationDetails.bot_name + ' scrie...' : 'Trimite'}
+            {isTyping ? t('messages.typing', { botName: situationDetails.bot_name }) : t('buttons.send')}
           </button>
         </form>
+
         <div className="situation-description">
           <p>{situation?.description || ''}</p>
         </div>
 
-        {/* Report Popup */}
+        {/* Report */}
         {reportGenerated && (
           <div className="report-overlay">
             <div className="report-content" id="report-content">
-              <h2>Raport de Conversație</h2>
+              <h2>{t('report.title')}</h2>
               <p className="report-meta">
-                Situație: <strong>{situationDetails.bot_name || 'Situație necunoscută'}</strong> &nbsp;|&nbsp;
-                Data: <strong>{new Date().toLocaleDateString('ro-RO')}</strong> &nbsp;|&nbsp;
-                Ora: <strong>{new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}</strong><br />
-                Utilizator: <strong>{userName || 'Anonim'}</strong>
+                {t('report.situation')}: <strong>{situationDetails.bot_name || 'Situație necunoscută'}</strong> &nbsp;|&nbsp;
+                {t('report.date')}: <strong>{new Date().toLocaleDateString('ro-RO')}</strong> &nbsp;|&nbsp;
+                {t('report.time')}: <strong>{new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}</strong><br />
+                {t('report.user')}: <strong>{userName || 'Anonim'}</strong>
               </p>
               <div className="report-details">
                 <div className="metrics-section">
-                  <h3>Metrici de Comunicare</h3>
-                  <p>Succces General: {userProgress?.overall_success || 0}%</p>
-                  <p>Stil Asertiv: {userProgress?.assertive_percent || 0}%</p>
-                  <p>Stil Agresiv: {userProgress?.aggressive_percent || 0}%</p>
-                  <p>Stil Pasiv: {userProgress?.passive_percent || 0}%</p>
+                  <h3>{t('report.metrics.title')}</h3>
+                  <p>{t('report.metrics.overall', { value: userProgress?.overall_success || 0 })}</p>
+                  <p>{t('report.metrics.assertive', { value: userProgress?.assertive_percent || 0 })}</p>
+                  <p>{t('report.metrics.aggressive', { value: userProgress?.aggressive_percent || 0 })}</p>
+                  <p>{t('report.metrics.passive', { value: userProgress?.passive_percent || 0 })}</p>
                 </div>
-
                 <div className="good-points-section">
-                  <h3>Puncte Forte în Dialog</h3>
+                  <h3>{t('report.strengths.title')}</h3>
                   <p>{userProgress?.dialogue_good_points}</p>
                 </div>
-
                 <div className="recommendations-section">
-                  <h3>Recomandări pentru Îmbunătățire</h3>
+                  <h3>{t('report.recommendations.title')}</h3>
                   <ul>
                     <li>{userProgress?.recommendation1}</li>
                     <li>{userProgress?.recommendation2}</li>
                   </ul>
                 </div>
               </div>
-              <button
-                className="download-button"
-                onClick={handleDownloadPdf}
-              >
-                Descarcă PDF
-              </button>
-              <button
-                className="continue-button"
-                onClick={handleCloseReport}
-              >
-                Închide
-              </button>
+              <button className="download-button" onClick={handleDownloadPdf}>{t('buttons.downloadPdf')}</button>
+              <button className="continue-button" onClick={handleCloseReport}>{t('buttons.close')}</button>
+            </div>
+          </div>
+        )}
+
+        {/* Confirm End */}
+        {showEndConfirm && (
+          <div className="confirm-overlay">
+            <div className="confirm-dialog">
+              <p>{t('confirmEnd.title')}</p>
+              <div className="confirm-buttons">
+                <button className="confirm-yes" onClick={handleEndNow}>{t('buttons.ok')}</button>
+                <button className="confirm-no" onClick={() => setShowEndConfirm(false)}>{t('buttons.cancel')}</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Too Few Messages */}
+        {showTooFewMessagesWarning && (
+          <div className="confirm-overlay">
+            <div className="confirm-dialog">
+              <p>{t('tooFewMessages.title')}</p>
+              <div className="confirm-buttons">
+                <button className="confirm-yes" onClick={handleTooFewMessagesOk}>{t('buttons.ok')}</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Objectives Modal */}
+        {showObjectivesPopup && (
+          <div className="objectives-modal-overlay" onClick={() => setShowObjectivesPopup(false)}>
+            <div className="objectives-modal" onClick={(e) => e.stopPropagation()}>
+              <h2>{t('objectives.title')}</h2>
+              <p>{t('objectives.text')}</p>
+              <button onClick={() => setShowObjectivesPopup(false)}>{t('buttons.dismiss')}</button>
             </div>
           </div>
         )}
       </div>
-      {showEndConfirm && (
-        <div className="confirm-overlay">
-          <div className="confirm-dialog">
-            <p>Ești sigur că vrei să închei conversația acum?</p>
-            <div className="confirm-buttons">
-              <button className="confirm-yes" onClick={handleEndNow}>OK</button>
-              <button className="confirm-no" onClick={() => setShowEndConfirm(false)}>Renunță</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {showTooFewMessagesWarning && (
-        <div className="confirm-overlay">
-          <div className="confirm-dialog">
-            <p>Este nevoie de cel puțin 5 mesaje pentru a genera un raport.</p>
-            <div className="confirm-buttons">
-              <button className="confirm-yes" onClick={handleTooFewMessagesOk}>OK</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {showObjectivesPopup && (
-        <div className="objectives-modal-overlay" onClick={() => setShowObjectivesPopup(false)}>
-          <div className="objectives-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>🎯 Obiective în această conversație</h2>
-            <p>Obiectivul tău este să clarifici cât de bine poți subiectele interlocutorului, consolidând și relația voastră.</p>
-            <button onClick={() => setShowObjectivesPopup(false)}>Închide</button>
-          </div>
-        </div>
-      )}
     </div>
-
   );
 };
 

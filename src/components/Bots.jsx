@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Dashboard.css';
-import maleBotPicture from '../assets/male_bot_picture-Photoroom.png';
-import femaleBotPicture from '../assets/female_bot_picture-Photoroom.png';
 import andrei from '../assets/01.Andrei.png';
 import cristina from '../assets/02.Cristina.png';
 import radu from '../assets/03.Radu.png';
@@ -22,6 +21,7 @@ const Bots = () => {
   const [totalBotsCount, setTotalBotsCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const getUserAndBots = async () => {
@@ -184,19 +184,19 @@ const Bots = () => {
               className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard')}
             >
-              Dashboard
+              {t('nav.dashboard')}
             </button>
             <button
               className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
               onClick={() => navigate('/bots')}
             >
-              Situații
+              {t('nav.situations')}
             </button>
             <button
               className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
               onClick={() => navigate('/reports')}
             >
-              Rapoarte
+              {t('nav.reports')}
             </button>
           </div>
         </div>
@@ -210,13 +210,13 @@ const Bots = () => {
             alt="VERBO Logo"
             style={{ height: '150px', marginLeft: '20px' }}
           />
-          <h1>Situații</h1>
+          <h1>{t('situations')}</h1>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <button onClick={goToDashboard} className="logout-button">
-              Înapoi la Dashboard
+              {t('back_dashboard')}
             </button>
             <button onClick={handleLogout} className="logout-button">
-              Logout
+              {t('logout')}
             </button>
           </div>
         </div>
@@ -224,27 +224,35 @@ const Bots = () => {
         <div className="dashboard-content">
           <div className="reports-section">
             <div className="section-header">
-              <h2>Situații disponibile</h2>
+              <h2>{t('bots.availableSituations')}</h2>
+
               {!['pro', 'team', 'team pro'].includes(accessType) && (
                 <div className="upgrade-message">
                   {accessType === 'trial' ? (
-                    <p>Ești în perioada de probă! Fă upgrade la Pro pentru a debloca toate situațiile.</p>
+                    <p>{t('bots.trialMessage')}</p>
                   ) : (
-                    <p>Deblochează încă {Math.max(totalBotsCount - 3, 0)} situații făcând upgrade la versiunea Pro!</p>
+                    <p>
+                      {t('bots.upgradeMessage', {
+                        count: Math.max(totalBotsCount - 3, 0),
+                      })}
+                    </p>
                   )}
                 </div>
               )}
             </div>
+
             <div className="bots-grid">
               {loading ? (
-                <div className="loading">Încărcare situații...</div>
+                <div className="loading">{t('bots.loading')}</div>
               ) : error ? (
-                <div className="error">Eroare încărcare situații: {error}</div>
+                <div className="error">
+                  {t('bots.error', { error })}
+                </div>
               ) : (
                 <div className="categories-container">
                   {Object.entries(
                     bots.reduce((acc, bot) => {
-                      const category = bot.categories?.title || 'Uncategorized';
+                      const category = bot.categories?.title || t('bots.uncategorized');
                       if (!acc[category]) acc[category] = [];
                       acc[category].push(bot);
                       return acc;

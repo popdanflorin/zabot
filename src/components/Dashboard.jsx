@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import './Dashboard.css';
+import { useTranslation } from 'react-i18next';
 import { Calendar } from 'lucide-react'
+import './Dashboard.css';
 import logo from "../assets/Verbo-nbg-dashboard.png";
 import andrei from '../assets/01.Andrei.png';
 import cristina from '../assets/02.Cristina.png';
@@ -34,6 +35,7 @@ const Dashboard = () => {
   const [referralName, setReferralName] = useState('');
   const [hasReferred, setHasReferred] = useState(false);
   const [referralSuccess, setReferralSuccess] = useState(false);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -441,19 +443,19 @@ const Dashboard = () => {
               className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard')}
             >
-              Dashboard
+              {t('nav.dashboard')}
             </button>
             <button
               className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
               onClick={() => navigate('/bots')}
             >
-              Situații
+              {t('nav.situations')}
             </button>
             <button
               className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
               onClick={() => navigate('/reports')}
             >
-              Rapoarte
+              {t('nav.reports')}
             </button>
           </div>
         </div>
@@ -467,72 +469,80 @@ const Dashboard = () => {
             alt="VERBO Logo"
             className="logo"
           />
-          <h1>Dashboard</h1>
+          <h1>{t('dashboard')}</h1>
+          <select
+            className="language-select"
+            value={i18n.language}
+            onChange={(e) => i18n.changeLanguage(e.target.value)}
+          >
+            <option value="ro">Română</option>
+            <option value="en">English</option>
+          </select>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", textAlign: "left" }}>
               <span className="user-name">
                 🙍‍♂️ {userName}
               </span>
               <span className="plan-badge">
-                {`Plan: ${accessType.toUpperCase()}`}
+                {`${t('plan')}: ${accessType.toUpperCase()}`}
               </span>
               {accessType === 'trial' && trialHoursLeft !== null && (
                 <span style={{ color: '#f87171', fontWeight: 'bold' }}>
-                  ⏳ {trialHoursLeft} {trialHoursLeft === 1 ? 'ora' : 'ore'} rămase din perioada de trial
+                  ⏳ {trialHoursLeft} {trialHoursLeft === 1 ? t('hour') : t('hours')} {t('remaining_trial_hours')}
                 </span>
               )}
               {(accessType === 'pro' || accessType === 'team') && (
                 <button onClick={cancelSubscription} className="cancel-link">
-                  Anulează abonamentul
+                  {t('cancel')}
                 </button>
               )}
+              <Link to="/privacy-policy" className="cancel-link" target="_blank" rel="noopener noreferrer">
+                {t('privacy_policy')}
+              </Link>
             </div>
             {(accessType === 'free' || accessType === 'trial') && (
               <button onClick={() => navigate('/subscriptions')} className="logout-button confirm">
-                Abonează-te
+                {t('subscribe')}
               </button>
             )}
             {(accessType !== 'free') && (
               <button onClick={() => navigate('/leaderboard')} className="logout-button">
-                Leaderboard
+                {t('leaderboard_name')}
               </button>
             )}
             {accessType === 'team' && (
               <button onClick={openTeamModal} className="logout-button">
-                Echipa mea
+                {t('my_team')}
               </button>
             )}
             <button onClick={() => setFeedbackOpen(true)} className="logout-button">
-              Feedback
+              {t('feedback')}
             </button>
             {!hasReferred && (
               <button onClick={() => setReferralOpen(true)} className="logout-button">
-                Community Access
+                {t('community_access')}
               </button>
             )}
             <button onClick={handleLogout} className="logout-button">
-              Logout
+              {t('logout')}
             </button>
-            <Link to="/privacy-policy" className="cancel-link" target="_blank" rel="noopener noreferrer">
-              Privacy Policy
-            </Link>
+
           </div>
         </div>
 
         <div className="dashboard-content">
           <div className="reports-section">
             <div className="section-header">
-              <h2>Cele mai recente rapoarte</h2>
-              <a href="/reports" className="see-all-link">Vezi toate rapoartele</a>
+              <h2>{t('latest_reports')}</h2>
+              <a href="/reports" className="see-all-link">{t('view_all_reports')}</a>
             </div>
             <div className="reports-grid">
               {loading ? (
-                <div className="loading">Se încarcă rapoartele...</div>
+                <div className="loading">{t('loading_reports')}</div>
               ) : error ? (
-                <div className="error">Eroare la încărcarea rapoartelor: {error}</div>
+                <div className="error">{t('error_reports')} {error}</div>
               ) : reports.length === 0 ? (
-                <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi
-                  progresul tău!</div>
+                <div className="no-reports">{t('no_reports')}</div>
               ) : (
                 reports.map((report) => (
                   <div key={report.id} className="report-card">
@@ -541,7 +551,7 @@ const Dashboard = () => {
                       className="difficulty-badge"
                       style={{ backgroundColor: getSuccessColor(report.overall_success) }}
                     >
-                      {report.overall_success}% Success
+                      {report.overall_success}{t('success')}
                     </span>
                     <span className="report-date">
                       <Calendar size={14} style={{ marginRight: '6px' }} />
@@ -552,8 +562,8 @@ const Dashboard = () => {
             </div>
 
             <div className="section-header" style={{ marginTop: '40px' }}>
-              <h2>Situații sugerate</h2>
-              <a href="/bots" className="see-all-link">Vezi toate situațiile</a>
+              <h2>{t('suggested_situations')}</h2>
+              <a href="/bots" className="see-all-link">{t('view_all_situations')}</a>
             </div>
             <div className="reports-grid">
               {suggestedBots.map((bot) => (
@@ -588,18 +598,18 @@ const Dashboard = () => {
       {feedbackOpen && (
         <div className="feedback-modal-overlay">
           <div className="feedback-modal-content">
-            <h2>Lasă-ne un feedback 🙏</h2>
+            <h2>{t('leave_feedback')} 🙏</h2>
             <textarea
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Scrie părerea ta despre aplicație sau sugestii de îmbunătățire..."
+              placeholder={t('feedback_placeholder')}
             />
-            {feedbackSent && <p style={{ color: "lightgreen" }}>✅ Mulțumim pentru feedback!</p>}
+            {feedbackSent && <p style={{ color: "lightgreen" }}>✅ {t('feedback_thankyou')}</p>}
             <div>
               <button onClick={submitFeedback} disabled={submittingFeedback}>
-                {submittingFeedback ? "Se trimite..." : "Trimite"}
+                {submittingFeedback ? t('feedback_sending') : t('feedback_send')}
               </button>
-              <button onClick={() => setFeedbackOpen(false)}>Închide</button>
+              <button onClick={() => setFeedbackOpen(false)}>{t('close')}</button>
             </div>
           </div>
         </div>
@@ -607,7 +617,7 @@ const Dashboard = () => {
       {teamModalOpen && (
         <div className="feedback-modal-overlay">
           <div className="feedback-modal-content">
-            <h2>Membrii echipei 🧑‍🤝‍🧑</h2>
+            <h2>{t('teamModal.title')} 🧑‍🤝‍🧑</h2>
             <div style={{ display: "grid", gap: "8px", marginTop: "16px" }}>
               {teamMembers.length > 0 ? (
                 teamMembers.map((member, index) => (
@@ -620,7 +630,7 @@ const Dashboard = () => {
                   />
                 ))
               ) : (
-                <p>Nu ai membri în echipă încă.</p>
+                <p>{t('teamModal.empty')}</p>
               )}
             </div>
 
@@ -628,15 +638,15 @@ const Dashboard = () => {
             <div style={{ marginTop: "16px" }}>
               <input
                 type="email"
-                placeholder="Email nou membru"
+                placeholder={t('teamModal.inputPlaceholder')}
                 value={emailToAdd}
                 onChange={(e) => setEmailToAdd(e.target.value)}
                 style={{ padding: "8px", width: "100%", marginBottom: "8px" }}
               />
               <button onClick={() => handleAddTeamMember(emailToAdd)} style={{ marginRight: "8px" }}>
-                Adaugă membru
+                {t('teamModal.addButton')}
               </button>
-              <button onClick={() => setTeamModalOpen(false)}>Închide</button>
+              <button onClick={() => setTeamModalOpen(false)}>{t('teamModal.closeButton')}</button>
             </div>
           </div>
         </div>
@@ -644,21 +654,21 @@ const Dashboard = () => {
       {referralOpen && (
         <div className="referral-modal-overlay">
           <div className="referral-modal-content">
-            <h2>Community Code</h2>
+            <h2>{t('referralModal.title')}</h2>
             <input
               type="text"
               value={referralName}
               onChange={(e) => setReferralName(e.target.value)}
-              placeholder="Nume"
+              placeholder={t('referralModal.inputPlaceholder')}
             />
             {referralSuccess && (
               <div className="referral-success-message">
-                Mulțumim! Informația a fost salvată cu succes. 🎉
+                {t('referralModal.success')} 🎉
               </div>
             )}
             <div className="referral-modal-actions">
-              <button onClick={handleSaveReferral}>Salvează</button>
-              <button onClick={() => setReferralOpen(false)}>Renunță</button>
+              <button onClick={handleSaveReferral}>{t('referralModal.saveButton')}</button>
+              <button onClick={() => setReferralOpen(false)}>{t('referralModal.cancelButton')}</button>
             </div>
           </div>
         </div>

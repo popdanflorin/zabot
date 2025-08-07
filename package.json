@@ -18,10 +18,13 @@
     "@react-pdf/renderer": "^4.3.0",
     "@supabase/supabase-js": "^2.49.1",
     "html2pdf.js": "^0.10.3",
+    "i18next": "^25.3.2",
+    "i18next-browser-languagedetector": "^8.2.0",
     "lucide-react": "^0.487.0",
     "openai": "^4.87.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-i18next": "^15.6.1",
     "react-router-dom": "^7.3.0"
   },
   "devDependencies": {

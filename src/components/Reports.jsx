@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './Dashboard.css';
 import { Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import './Dashboard.css';
 import logo from "../assets/Verbo-nbg-dashboard.png";
 
 const Reports = () => {
@@ -14,6 +15,7 @@ const Reports = () => {
   const [accessType, setAccessType] = useState('free'); // 'free', 'trial', 'pro'
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const getUserAndAccess = async () => {
@@ -137,19 +139,19 @@ const Reports = () => {
               className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard')}
             >
-              Dashboard
+              {t('nav.dashboard')}
             </button>
             <button
               className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
               onClick={() => navigate('/bots')}
             >
-              Situații
+              {t('nav.situations')}
             </button>
             <button
               className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
               onClick={() => navigate('/reports')}
             >
-              Rapoarte
+              {t('nav.reports')}
             </button>
           </div>
         </div>
@@ -163,13 +165,13 @@ const Reports = () => {
             alt="VERBO Logo"
             style={{ height: '150px', marginLeft: '20px' }}
           />
-          <h1>Rapoarte</h1>
+          <h1>{t('reports_name')}</h1>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <button onClick={goToDashboard} className="logout-button">
-              Înapoi la Dashboard
+              {t('back_dashboard')}
             </button>
             <button onClick={handleLogout} className="logout-button">
-              Logout
+              {t('logout')}
             </button>
           </div>
         </div>
@@ -177,23 +179,27 @@ const Reports = () => {
         <div className="dashboard-content">
           <div className="reports-section">
             <div className="section-header">
-              <h2>Rapoartele tale</h2>
+              <h2>{t('reports.yourReports')}</h2>
             </div>
+
             <div className="bots-grid">
               {loading ? (
-                <div className="loading">Se încarcă rapoartele...</div>
+                <div className="loading">{t('reports.loading')}</div>
               ) : error ? (
-                <div className="error">Eroare la încărcarea rapoartelor: {error}</div>
+                <div className="error">
+                  {t('reports.error', { error })}
+                </div>
               ) : reports.length === 0 ? (
-                <div className="no-reports">Nu este niciun raport disponibil momentan. Completează situații ca să vezi
-                  progresul tău!</div>
+                <div className="no-reports">
+                  {t('reports.noReports')}
+                </div>
               ) : (
                 reports.map((report) => (
                   <div key={report.id} className={`bot-card${accessType === 'free' ? ' free-access' : ''}`}>
                     <div className="bot-card-content">
                       <div className="bot-card-header">
                         <div className="bot-info">
-                          <h3>{report.situations?.bot_name || 'Unknown Bot'}</h3>
+                          <h3>{report.situations?.bot_name || t('reports.unknownBot')}</h3>
                           <div className="report-date">
                             <Calendar size={14} style={{ marginRight: '6px' }} />
                             {formatDate(report.completed_at)}
@@ -204,30 +210,33 @@ const Reports = () => {
                           className="difficulty-badge"
                           style={{ backgroundColor: getSuccessColor(report.overall_success) }}
                         >
-                          {report.overall_success}% Success
+                          {report.overall_success}% {t('reports.success')}
                         </span>
                       </div>
-                      {accessType !== 'free' ? (
+
+                      {accessType !== 'free' && (
                         <div className="report-details">
                           <div className="report-metrics">
-                            <h4>Metrici de comunicare:</h4>
-                            <p>Asertiv: {report.assertive_percent}%</p>
-                            <p>Agresiv: {report.aggressive_percent}%</p>
-                            <p>Pasiv: {report.passive_percent}%</p>
+                            <h4>{t('reports.communicationMetrics')}</h4>
+                            <p>{t('reports.assertive')}: {report.assertive_percent}%</p>
+                            <p>{t('reports.aggressive')}: {report.aggressive_percent}%</p>
+                            <p>{t('reports.passive')}: {report.passive_percent}%</p>
                           </div>
+
                           <div className="report-good-points">
-                            <h4>Puncte Forte:</h4>
+                            <h4>{t('reports.goodPoints')}</h4>
                             <p>{report.dialogue_good_points}</p>
                           </div>
+
                           <div className="report-recommendations">
-                            <h4>Recomandări:</h4>
+                            <h4>{t('reports.recommendations')}</h4>
                             <ul>
                               <li>{report.recommendation1}</li>
                               <li>{report.recommendation2}</li>
                             </ul>
                           </div>
                         </div>
-                      ) : null}
+                      )}
                     </div>
                   </div>
                 ))

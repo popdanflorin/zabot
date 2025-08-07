@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabaseClient';
 import './Leaderboard.css';
 
@@ -10,6 +11,7 @@ const LeaderboardPage = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -55,19 +57,19 @@ const LeaderboardPage = () => {
               className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard')}
             >
-              Dashboard
+              {t('nav.dashboard')}
             </button>
             <button
               className={`nav-button ${location.pathname === '/bots' ? 'active' : ''}`}
               onClick={() => navigate('/bots')}
             >
-              Situații
+              {t('nav.situations')}
             </button>
             <button
               className={`nav-button ${location.pathname === '/reports' ? 'active' : ''}`}
               onClick={() => navigate('/reports')}
             >
-              Rapoarte
+              {t('nav.reports')}
             </button>
           </div>
         </div>
@@ -75,17 +77,17 @@ const LeaderboardPage = () => {
 
       {/* Main Content */}
       <div className="leaderboard-container">
-        <h1 className="leaderboard-title">🏆 Leaderboard</h1>
+        <h1 className="leaderboard-title">🏆 {t('leaderboard.title')}</h1>
 
         {loading ? (
-          <p className="leaderboard-loading">Loading...</p>
+          <p className="leaderboard-loading">{t('leaderboard.loading')}</p>
         ) : (
           <table className="leaderboard-table">
             <thead>
               <tr>
                 <th>#</th>
-                <th>Email</th>
-                <th>Score</th>
+                <th>{t('leaderboard.email')}</th>
+                <th>{t('leaderboard.score')}</th>
               </tr>
             </thead>
             {data && data.length > 0 ? (
@@ -93,17 +95,17 @@ const LeaderboardPage = () => {
                 {data.map((entry, index) => {
                   const rankClass =
                     index === 0 ? 'gold' :
-                    index === 1 ? 'silver' :
-                    index === 2 ? 'bronze' : '';
+                      index === 1 ? 'silver' :
+                        index === 2 ? 'bronze' : '';
 
                   return (
                     <tr key={entry.email ?? `row-${index}`}>
                       <td className={`leaderboard-rank ${rankClass}`}>
                         {index === 0 ? '🥇' :
-                         index === 1 ? '🥈' :
-                         index === 2 ? '🥉' : index + 1}
+                          index === 1 ? '🥈' :
+                            index === 2 ? '🥉' : index + 1}
                       </td>
-                      <td>{entry.email || 'Unknown'}</td>
+                      <td>{entry.email || t('leaderboard.unknown')}</td>
                       <td>{entry.overall_success}</td>
                     </tr>
                   );
@@ -113,7 +115,7 @@ const LeaderboardPage = () => {
               <tbody>
                 <tr>
                   <td colSpan="3" className="leaderboard-empty">
-                    Nu sunt date disponibile.
+                    {t('leaderboard.empty')}
                   </td>
                 </tr>
               </tbody>
