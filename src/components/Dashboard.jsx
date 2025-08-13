@@ -475,8 +475,8 @@ const Dashboard = () => {
             value={i18n.language}
             onChange={(e) => i18n.changeLanguage(e.target.value)}
           >
-            <option value="ro">Română</option>
             <option value="en">English</option>
+            <option value="ro">Română</option>
           </select>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", textAlign: "left" }}>
