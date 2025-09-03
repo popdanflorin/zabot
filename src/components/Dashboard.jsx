@@ -130,10 +130,10 @@ const Dashboard = () => {
                     )
                   `)
           .order('difficulty');
-        if (['trial', 'free'].includes(accessType)) {
+        if (['free'].includes(accessType)) {
           query = query.in('id', [2, 3, 5]);
         }
-        query = query.limit(5);
+        query = query.limit(10);
         const { data, error } = await query;
         if (error) throw error;
         setSuggestedBots(data);

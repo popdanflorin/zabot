@@ -79,7 +79,7 @@ const Bots = () => {
           `)
           .order('difficulty');
 
-        if (nextAccessType === 'free' || nextAccessType === 'trial') {
+        if (nextAccessType === 'free') {
           query = query.in('id', [2, 3, 5]);
         }
 
