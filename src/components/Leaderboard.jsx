@@ -30,7 +30,30 @@ const LeaderboardPage = () => {
         console.error('Error fetching leaderboard:', error.message);
       } else {
         const filteredData = data.filter(entry => entry.overall_success !== null);
-        setData(filteredData);
+
+        // sortare descrescătoare după scor
+        const sortedData = [...filteredData].sort(
+          (a, b) => b.overall_success - a.overall_success
+        );
+
+        const usedScores = new Set();
+        const adjustedData = sortedData.map(entry => {
+          let score = Math.round(entry.overall_success);
+
+          // dacă scorul există deja, căutăm un nou scor liber (+1 sau -1)
+          while (usedScores.has(score)) {
+            if (score > 0) {
+              score -= 1; // scădem
+            } else {
+              score += 1; // dacă ajunge la 0, creștem
+            }
+          }
+
+          usedScores.add(score);
+          return { ...entry, overall_success: score };
+        });
+
+        setData(adjustedData);
       }
       setLoading(false);
     };
