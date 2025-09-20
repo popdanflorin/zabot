@@ -98,6 +98,7 @@
         "loading": "Loading...",
         "email": "Email",
         "score": "Score",
+        "assertive": "Assertive %",
         "unknown": "Unknown",
         "empty": "No data available."
     },

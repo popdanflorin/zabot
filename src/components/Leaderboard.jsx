@@ -24,6 +24,7 @@ const LeaderboardPage = () => {
         .from('leaderboard_view')
         .select('*')
         .order('overall_success', { ascending: false })
+        .order('assertive_percent', { ascending: false })
         .limit(50);
 
       if (error) {
@@ -31,29 +32,7 @@ const LeaderboardPage = () => {
       } else {
         const filteredData = data.filter(entry => entry.overall_success !== null);
 
-        // sortare descrescătoare după scor
-        const sortedData = [...filteredData].sort(
-          (a, b) => b.overall_success - a.overall_success
-        );
-
-        const usedScores = new Set();
-        const adjustedData = sortedData.map(entry => {
-          let score = Math.round(entry.overall_success);
-
-          // dacă scorul există deja, căutăm un nou scor liber (+1 sau -1)
-          while (usedScores.has(score)) {
-            if (score > 0) {
-              score -= 1; // scădem
-            } else {
-              score += 1; // dacă ajunge la 0, creștem
-            }
-          }
-
-          usedScores.add(score);
-          return { ...entry, overall_success: score };
-        });
-
-        setData(adjustedData);
+        setData(filteredData);
       }
       setLoading(false);
     };
@@ -111,6 +90,7 @@ const LeaderboardPage = () => {
                 <th>#</th>
                 <th>{t('leaderboard.email')}</th>
                 <th>{t('leaderboard.score')}</th>
+                <th>{t('leaderboard.assertive')}</th>
               </tr>
             </thead>
             {data && data.length > 0 ? (
@@ -130,6 +110,7 @@ const LeaderboardPage = () => {
                       </td>
                       <td>{entry.email || t('leaderboard.unknown')}</td>
                       <td>{entry.overall_success}</td>
+                      <td>{entry.assertive_percent}%</td>
                     </tr>
                   );
                 })}
