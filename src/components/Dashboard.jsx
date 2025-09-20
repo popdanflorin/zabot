@@ -11,6 +11,7 @@ import radu from '../assets/03.Radu.png';
 import antonia from '../assets/04.Antonia.png';
 import alex from '../assets/05.Alex.png';
 import mihai from '../assets/06.Mihai.png';
+import andreea from '../assets/07.Andreea.png';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -422,6 +423,7 @@ const Dashboard = () => {
       4: antonia,
       5: alex,
       6: mihai,
+      7: andreea
     };
     return botPictures[botId];
   };
