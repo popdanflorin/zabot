@@ -99,6 +99,7 @@
         "email": "Email",
         "score": "Score",
         "assertive": "Assertive %",
+        "messageCount": "Message Count",
         "unknown": "Unknown",
         "empty": "No data available."
     },

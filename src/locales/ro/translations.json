@@ -99,6 +99,7 @@
         "email": "Email",
         "score": "Scor",
         "assertive": "% Asertiv",
+        "messageCount": "Nr. Mesaje",
         "unknown": "Necunoscut",
         "empty": "Nu sunt date disponibile."
     },

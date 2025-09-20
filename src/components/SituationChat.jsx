@@ -314,7 +314,7 @@ const SituationChat = ({ situations }) => {
     }
   };
 
-  const saveUserProgress = async (metrics) => {
+  const saveUserProgress = async (metrics, messageCount) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -331,7 +331,8 @@ const SituationChat = ({ situations }) => {
           dialogue_good_points: metrics.dialogue_good_points,
           recommendation1: metrics.recommendation1 || "Nu sunt recomandări disponibile",
           recommendation2: metrics.recommendation2 || "Nu sunt recomandări disponibile",
-          completed_at: new Date().toISOString()
+          completed_at: new Date().toISOString(),
+          message_count: messageCount
         })
         .select()
         .single();
@@ -347,7 +348,7 @@ const SituationChat = ({ situations }) => {
 
   const generateReport = async () => {
     const metrics = await analyzeCommunicationStyle(messages);
-    await saveUserProgress(metrics);
+    await saveUserProgress(metrics, messages.filter(m => m.sender === "user").length);
     setUserProgress(metrics);
     setReportGenerated(true);
   };

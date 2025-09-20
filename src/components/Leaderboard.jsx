@@ -25,6 +25,7 @@ const LeaderboardPage = () => {
         .select('*')
         .order('overall_success', { ascending: false })
         .order('assertive_percent', { ascending: false })
+        .order('message_count', { ascending: false })
         .limit(50);
 
       if (error) {
@@ -91,6 +92,7 @@ const LeaderboardPage = () => {
                 <th>{t('leaderboard.email')}</th>
                 <th>{t('leaderboard.score')}</th>
                 <th>{t('leaderboard.assertive')}</th>
+                <th>{t('leaderboard.messageCount')}</th>
               </tr>
             </thead>
             {data && data.length > 0 ? (
@@ -111,6 +113,7 @@ const LeaderboardPage = () => {
                       <td>{entry.email || t('leaderboard.unknown')}</td>
                       <td>{entry.overall_success}</td>
                       <td>{entry.assertive_percent}%</td>
+                      <td>{entry.message_count}</td>
                     </tr>
                   );
                 })}
