@@ -10,6 +10,8 @@ import antonia from '../assets/04.Antonia.png';
 import alex from '../assets/05.Alex.png';
 import mihai from '../assets/06.Mihai.png';
 import andreea from '../assets/07.Andreea.png';
+import sorin from '../assets/07.Sorin.png';
+import viorel from '../assets/07.Viorel.png';
 import logo from "../assets/Verbo-nbg-dashboard.png";
 
 const Bots = () => {
@@ -152,7 +154,9 @@ const Bots = () => {
       4: antonia,
       5: alex,
       6: mihai,
-      7: andreea
+      7: andreea,
+      8: sorin,
+      9: viorel
     };
     return botPictures[botId];
   };
