@@ -6,8 +6,8 @@ const stripe = new Stripe(Deno.env.get("NEW_STRIPE_API_KEY"), {
 });
 const supabase = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
 const priceIds = {
-  pro: "price_1RmUTJRr5lNKMugrfu6cm41P",
-  team: "price_1RmUTvRr5lNKMugrmAic0Ttk"
+  pro: "price_1SQ1hPRr5lNKMugr2Ml1xYfE",
+  team: "price_1SQ1v4Rr5lNKMugrvABt3KH3"
 };
 serve(async (req)=>{
   if (req.method === "OPTIONS") {

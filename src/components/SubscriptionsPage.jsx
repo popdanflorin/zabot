@@ -82,8 +82,8 @@ const SubscriptionsPage = () => {
           <div className="badge badge-popular">{t("subscriptions.popular")}</div>
           <h2>{t("subscriptions.proPlan")}</h2>
           <div className="price">
-            <div className="old-price">{t("subscriptions.oldPrice", { price: 109 })}</div>
-            <div className="new-price">{t("subscriptions.newPrice", { price: 69 })}</div>
+            <div className="old-price">{t("subscriptions.oldPrice", { price: 149 })}</div>
+            <div className="new-price">{t("subscriptions.newPrice", { price: 99 })}</div>
           </div>
           <button className="subscribe-plan-button" onClick={() => startCheckout('pro', t)}>
             {t("subscriptions.subscribe")}
@@ -94,8 +94,8 @@ const SubscriptionsPage = () => {
           <div className="badge badge-bestdeal">{t("subscriptions.bestDeal")}</div>
           <h2>{t("subscriptions.teamPlan")}</h2>
           <div className="price">
-            <div className="old-price">{t("subscriptions.oldPrice", { price: 850 })}</div>
-            <div className="new-price">{t("subscriptions.newPrice", { price: 519 })}</div>
+            <div className="old-price">{t("subscriptions.oldPrice", { price: 1399 })}</div>
+            <div className="new-price">{t("subscriptions.newPrice", { price: 899 })}</div>
           </div>
           <button className="subscribe-plan-button" onClick={() => startCheckout('team', t)}>
             {t("subscriptions.subscribe")}
