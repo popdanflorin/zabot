@@ -84,6 +84,7 @@ const SubscriptionsPage = () => {
           <div className="price">
             <div className="old-price">{t("subscriptions.oldPrice", { price: 149 })}</div>
             <div className="new-price">{t("subscriptions.newPrice", { price: 99 })}</div>
+            <div>{t("subscriptions.tva-text")}</div>
           </div>
           <button className="subscribe-plan-button" onClick={() => startCheckout('pro', t)}>
             {t("subscriptions.subscribe")}
@@ -96,6 +97,7 @@ const SubscriptionsPage = () => {
           <div className="price">
             <div className="old-price">{t("subscriptions.oldPrice", { price: 1399 })}</div>
             <div className="new-price">{t("subscriptions.newPrice", { price: 899 })}</div>
+            <div>{t("subscriptions.tva-text")}</div>
           </div>
           <button className="subscribe-plan-button" onClick={() => startCheckout('team', t)}>
             {t("subscriptions.subscribe")}

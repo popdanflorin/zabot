@@ -75,6 +75,7 @@
         "pricePerMonth": "{{price}} EUR /year",
         "oldPrice": "{{price}} EUR /year",
         "newPrice": "{{price}} EUR /year",
+        "tva-text": "(VAT included)",
         "activateAutomatically": "Activ Automat",
         "subscribe": "Subscribe",
         "popular": "Popular",
@@ -178,7 +179,7 @@
         "title": "Are you sure you want to end the situation?"
     },
     "tooFewMessages": {
-        "title": "You need to send at least 2 messages before ending the situation."
+        "title": "You need to send at least 3 messages before ending the situation."
     },
     "objectives": {
         "title": "🎯 Situation Objectives",

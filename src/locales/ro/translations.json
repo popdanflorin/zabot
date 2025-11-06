@@ -75,6 +75,7 @@
         "pricePerMonth": "{{price}} EUR /an",
         "oldPrice": "{{price}} EUR /an",
         "newPrice": "{{price}} EUR /an",
+        "tva-text": "(TVA inclus)",
         "activateAutomatically": "Activ Automat",
         "subscribe": "Abonează-te",
         "popular": "Popular",
@@ -178,7 +179,7 @@
         "title": "Ești sigur că vrei să închei conversația acum?"
     },
     "tooFewMessages": {
-        "title": "Este nevoie de cel puțin 5 mesaje pentru a genera un raport."
+        "title": "Este nevoie de cel puțin 3 mesaje pentru a genera un raport."
     },
     "objectives": {
         "title": "🎯 Obiective în această conversație",

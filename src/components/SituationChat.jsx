@@ -237,7 +237,7 @@ const SituationChat = ({ situations }) => {
   const handleEndNow = () => {
     const userMessagesCount = messages.filter(m => m.sender === 'user').length;
 
-    if (userMessagesCount < 5) {
+    if (userMessagesCount < 3) {
       setShowEndConfirm(false);
       setShowTooFewMessagesWarning(true);
       setShouldRedirect(false);
@@ -357,7 +357,7 @@ const SituationChat = ({ situations }) => {
     if (timeLeft === 0 && showReport && !reportGenerated) {
       const userMessagesCount = messages.filter(m => m.sender === 'user').length;
 
-      if (userMessagesCount < 5) {
+      if (userMessagesCount < 3) {
         setShowTooFewMessagesWarning(true);
         setShouldRedirect(true);
         return;
